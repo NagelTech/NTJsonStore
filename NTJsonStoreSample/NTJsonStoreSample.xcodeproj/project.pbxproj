@@ -19,6 +19,13 @@
 		F051E20518E29A8D008E0FFD /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F051E1ED18E29A8D008E0FFD /* UIKit.framework */; };
 		F051E20D18E29A8D008E0FFD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F051E20B18E29A8D008E0FFD /* InfoPlist.strings */; };
 		F051E20F18E29A8D008E0FFD /* NTJsonStoreSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E20E18E29A8D008E0FFD /* NTJsonStoreSampleTests.m */; };
+		F051E21B18E29EB9008E0FFD /* NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E21A18E29EB9008E0FFD /* NTJsonStore.m */; };
+		F051E21E18E29EE5008E0FFD /* NTJsonCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E21D18E29EE5008E0FFD /* NTJsonCollection.m */; };
+		F051E22018E33B13008E0FFD /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F051E21F18E33B13008E0FFD /* libsqlite3.dylib */; };
+		F051E22918E34F97008E0FFD /* NTJsonColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E22818E34F97008E0FFD /* NTJsonColumn.m */; };
+		F051E22F18E379F1008E0FFD /* NSArray+NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E22E18E379F1008E0FFD /* NSArray+NTJsonStore.m */; };
+		F051E23218E380B3008E0FFD /* NSDictionary+NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */; };
+		F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */ = {isa = PBXBuildFile; fileRef = F051E23318E3AC8E008E0FFD /* ReceiverData.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +55,21 @@
 		F051E20A18E29A8D008E0FFD /* NTJsonStoreSampleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NTJsonStoreSampleTests-Info.plist"; sourceTree = "<group>"; };
 		F051E20C18E29A8D008E0FFD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		F051E20E18E29A8D008E0FFD /* NTJsonStoreSampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NTJsonStoreSampleTests.m; sourceTree = "<group>"; };
+		F051E21918E29EB9008E0FFD /* NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonStore.h; sourceTree = "<group>"; };
+		F051E21A18E29EB9008E0FFD /* NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonStore.m; sourceTree = "<group>"; };
+		F051E21C18E29EE5008E0FFD /* NTJsonCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonCollection.h; sourceTree = "<group>"; };
+		F051E21D18E29EE5008E0FFD /* NTJsonCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonCollection.m; sourceTree = "<group>"; };
+		F051E21F18E33B13008E0FFD /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonStore+Private.h"; sourceTree = "<group>"; };
+		F051E22418E341BB008E0FFD /* NTJsonCollection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonCollection+Private.h"; sourceTree = "<group>"; };
+		F051E22718E34F97008E0FFD /* NTJsonColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonColumn.h; sourceTree = "<group>"; };
+		F051E22818E34F97008E0FFD /* NTJsonColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonColumn.m; sourceTree = "<group>"; };
+		F051E22A18E34FB0008E0FFD /* NTJsonColumn+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonColumn+Private.h"; sourceTree = "<group>"; };
+		F051E22D18E379F1008E0FFD /* NSArray+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+NTJsonStore.h"; sourceTree = "<group>"; };
+		F051E22E18E379F1008E0FFD /* NSArray+NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+NTJsonStore.m"; sourceTree = "<group>"; };
+		F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NTJsonStore.h"; sourceTree = "<group>"; };
+		F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NTJsonStore.m"; sourceTree = "<group>"; };
+		F051E23318E3AC8E008E0FFD /* ReceiverData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ReceiverData.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F051E22018E33B13008E0FFD /* libsqlite3.dylib in Frameworks */,
 				F051E1EC18E29A8D008E0FFD /* CoreGraphics.framework in Frameworks */,
 				F051E1EE18E29A8D008E0FFD /* UIKit.framework in Frameworks */,
 				F051E1EA18E29A8D008E0FFD /* Foundation.framework in Frameworks */,
@@ -77,6 +100,7 @@
 		F051E1DD18E29A8D008E0FFD = {
 			isa = PBXGroup;
 			children = (
+				F051E21818E29E8C008E0FFD /* NTJsonStore */,
 				F051E1EF18E29A8D008E0FFD /* NTJsonStoreSample */,
 				F051E20818E29A8D008E0FFD /* NTJsonStoreSampleTests */,
 				F051E1E818E29A8D008E0FFD /* Frameworks */,
@@ -96,6 +120,7 @@
 		F051E1E818E29A8D008E0FFD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F051E21F18E33B13008E0FFD /* libsqlite3.dylib */,
 				F051E1E918E29A8D008E0FFD /* Foundation.framework */,
 				F051E1EB18E29A8D008E0FFD /* CoreGraphics.framework */,
 				F051E1ED18E29A8D008E0FFD /* UIKit.framework */,
@@ -107,6 +132,7 @@
 		F051E1EF18E29A8D008E0FFD /* NTJsonStoreSample */ = {
 			isa = PBXGroup;
 			children = (
+				F051E23318E3AC8E008E0FFD /* ReceiverData.json */,
 				F051E1F818E29A8D008E0FFD /* AppDelegate.h */,
 				F051E1F918E29A8D008E0FFD /* AppDelegate.m */,
 				F051E1FB18E29A8D008E0FFD /* Images.xcassets */,
@@ -142,6 +168,27 @@
 				F051E20B18E29A8D008E0FFD /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F051E21818E29E8C008E0FFD /* NTJsonStore */ = {
+			isa = PBXGroup;
+			children = (
+				F051E22D18E379F1008E0FFD /* NSArray+NTJsonStore.h */,
+				F051E22E18E379F1008E0FFD /* NSArray+NTJsonStore.m */,
+				F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */,
+				F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */,
+				F051E22418E341BB008E0FFD /* NTJsonCollection+Private.h */,
+				F051E21C18E29EE5008E0FFD /* NTJsonCollection.h */,
+				F051E21D18E29EE5008E0FFD /* NTJsonCollection.m */,
+				F051E22A18E34FB0008E0FFD /* NTJsonColumn+Private.h */,
+				F051E22718E34F97008E0FFD /* NTJsonColumn.h */,
+				F051E22818E34F97008E0FFD /* NTJsonColumn.m */,
+				F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */,
+				F051E21918E29EB9008E0FFD /* NTJsonStore.h */,
+				F051E21A18E29EB9008E0FFD /* NTJsonStore.m */,
+			);
+			name = NTJsonStore;
+			path = ..;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */,
 				F051E1F418E29A8D008E0FFD /* InfoPlist.strings in Resources */,
 				F051E1FC18E29A8D008E0FFD /* Images.xcassets in Resources */,
 			);
@@ -239,7 +287,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F051E22918E34F97008E0FFD /* NTJsonColumn.m in Sources */,
 				F051E1FA18E29A8D008E0FFD /* AppDelegate.m in Sources */,
+				F051E22F18E379F1008E0FFD /* NSArray+NTJsonStore.m in Sources */,
+				F051E21E18E29EE5008E0FFD /* NTJsonCollection.m in Sources */,
+				F051E23218E380B3008E0FFD /* NSDictionary+NTJsonStore.m in Sources */,
+				F051E21B18E29EB9008E0FFD /* NTJsonStore.m in Sources */,
 				F051E1F618E29A8D008E0FFD /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

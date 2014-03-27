@@ -8,7 +8,52 @@
 
 #import "AppDelegate.h"
 
+#import "NTJsonStore.h"
+
+
 @implementation AppDelegate
+
+
+-(void)load:(NSArray *)items intoCollection:(NTJsonCollection *)collection
+{
+    for(NSDictionary *item in items)
+        [collection insert:item];
+}
+
+-(void)loadDataWithStore:(NTJsonStore *)store
+{
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"ReceiverData" ofType:@"json"];
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+
+    [self load:json[@"categories"] intoCollection:[store collectionWithName:@"categories"]];
+    [self load:json[@"sources"] intoCollection:[store collectionWithName:@"sources"]];
+    [self load:json[@"messages"] intoCollection:[store collectionWithName:@"messages"]];
+}
+
+
+-(void)doTest
+{
+    NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"sample.db"];
+    
+    if ( !store.collections.count )
+        [self loadDataWithStore:store];
+    
+    // Ok, now we can use our data...
+    
+    NTJsonCollection *messagesCollection = [store collectionWithName:@"messages"];
+    NTJsonCollection *sourcesCollection = [store collectionWithName:@"sources"];
+    
+    NSArray *messages = [messagesCollection findWhere:nil args:nil orderBy:@"[categoryId], [sourceId]"];
+    
+    for(NSDictionary *message in messages)
+    {
+        NSDictionary *source = [sourcesCollection findOneWhere:@"[id] = ?" args:@[message[@"sourceId"]]];
+        
+        NSLog(@"message id %@: source name = %@", message[@"id"], source[@"name"]);
+    }
+}
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -16,6 +61,9 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    [self doTest];
+    
     return YES;
 }
 
