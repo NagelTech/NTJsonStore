@@ -26,6 +26,8 @@
 
 -(NTJsonCollection *)collectionWithName:(NSString *)collectionName;
 
+-(BOOL)ensureSchema;
+
 @end
 
 

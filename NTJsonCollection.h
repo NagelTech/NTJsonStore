@@ -17,17 +17,24 @@
 @property (nonatomic,readonly) NSString *name;
 @property (nonatomic,readonly) NTJsonStore *store;
 
--(NSDictionary *)insert:(NSDictionary *)json;
+-(void)addIndexWithKeys:(NSString *)keys;
+-(void)addUniqueIndexWithKeys:(NSString *)keys;
+-(void)addQueryableFields:(NSString *)fields;
+-(BOOL)ensureSchema;
+
+-(NSMutableDictionary *)insert:(NSDictionary *)json;
 -(BOOL)update:(NSDictionary *)json;
--(BOOL)remove:(int)rowid;
+-(BOOL)remove:(NSDictionary *)json;
 
 -(int)countWhere:(NSString *)where args:(NSArray *)args;
 -(int)count;
 
 -(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy;
--(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
+-(NSMutableDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
 
 -(int)removeWhere:(NSString *)where args:(NSArray *)args;
+
+-(NSString *)description;
 
 @end
 

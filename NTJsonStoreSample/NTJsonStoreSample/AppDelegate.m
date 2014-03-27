@@ -32,26 +32,77 @@
 }
 
 
--(void)doTest
+-(void)dumpMessagesInStore:(NTJsonStore *)store
 {
-    NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"sample.db"];
-    
-    if ( !store.collections.count )
-        [self loadDataWithStore:store];
-    
-    // Ok, now we can use our data...
-    
     NTJsonCollection *messagesCollection = [store collectionWithName:@"messages"];
     NTJsonCollection *sourcesCollection = [store collectionWithName:@"sources"];
-    
+    NTJsonCollection *categoriesCollection = [store collectionWithName:@"categories"];
+
     NSArray *messages = [messagesCollection findWhere:nil args:nil orderBy:@"[categoryId], [sourceId]"];
     
     for(NSDictionary *message in messages)
     {
         NSDictionary *source = [sourcesCollection findOneWhere:@"[id] = ?" args:@[message[@"sourceId"]]];
+        NSDictionary *category = [categoriesCollection findOneWhere:@"[id] = ?" args:@[message[@"categoryId"]]];
         
-        NSLog(@"message id %@: source name = %@", message[@"id"], source[@"name"]);
+        NSLog(@"message id %@: source name = %@, category name = %@", message[@"id"], source[@"name"], category[@"name"]);
     }
+}
+
+
+-(void)doTest
+{
+    NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"sample.db"];
+
+    if ( !store.collections.count )
+        [self loadDataWithStore:store];
+    
+    NSLog(@"Collections: %@", [store.collections componentsJoinedByString:@", "]);
+    
+    // Ok, now we can use our data...
+    
+    NTJsonCollection *messagesCollection = [store collectionWithName:@"messages"];
+    NTJsonCollection *sourcesCollection = [store collectionWithName:@"sources"];
+    NTJsonCollection *categoriesCollection = [store collectionWithName:@"categories"];
+    
+    [messagesCollection addUniqueIndexWithKeys:@"[id]"];
+    [messagesCollection addIndexWithKeys:@"[categoryId]"];
+    [messagesCollection addIndexWithKeys:@"[sourceId]"];
+    
+    [sourcesCollection addUniqueIndexWithKeys:@"[id]"];
+    [sourcesCollection addIndexWithKeys:@"[name]"];
+    
+    [categoriesCollection addUniqueIndexWithKeys:@"[id]"];
+    [categoriesCollection addIndexWithKeys:@"[name]"];
+    
+    NSLog(@"Initial Data");
+    
+    [self dumpMessagesInStore:store];
+    
+    // Convert Category ID's to numeric...
+    
+    int categoryIndex = 1;
+    
+    for(NSMutableDictionary *category in [categoriesCollection findWhere:nil args:nil orderBy:@"[id] desc"])
+    {
+        NSArray *messages = [messagesCollection findWhere:@"[categoryId]=?" args:@[category[@"id"]] orderBy:nil];
+        
+        category[@"id"] = @(categoryIndex);
+        
+        [categoriesCollection update:category];
+        
+        for(NSMutableDictionary *message in messages)
+        {
+            message[@"categoryId"] = @(categoryIndex);
+            [messagesCollection update:message];
+        }
+        
+        ++categoryIndex;
+    }
+    
+    NSLog(@"After category update");
+    
+    [self dumpMessagesInStore:store];
 }
 
 

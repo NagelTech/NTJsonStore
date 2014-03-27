@@ -14,9 +14,9 @@
 @interface NTJsonCollection (Private)
 
 @property (nonatomic,readonly) NSArray *columns;
+@property (nonatomic,readonly) NSArray *indexes;
 
 -(id)initWithStore:(NTJsonStore *)store name:(NSString *)name;
-
--(BOOL)createCollection;
+-(id)initNewCollectionWithStore:(NTJsonStore *)store name:(NSString *)name;
 
 @end

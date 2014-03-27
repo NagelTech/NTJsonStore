@@ -26,6 +26,7 @@
 		F051E22F18E379F1008E0FFD /* NSArray+NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E22E18E379F1008E0FFD /* NSArray+NTJsonStore.m */; };
 		F051E23218E380B3008E0FFD /* NSDictionary+NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */; };
 		F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */ = {isa = PBXBuildFile; fileRef = F051E23318E3AC8E008E0FFD /* ReceiverData.json */; };
+		F0C84A4618E4B47B00496DE6 /* NTJsonIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,9 @@
 		F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NTJsonStore.h"; sourceTree = "<group>"; };
 		F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NTJsonStore.m"; sourceTree = "<group>"; };
 		F051E23318E3AC8E008E0FFD /* ReceiverData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ReceiverData.json; sourceTree = "<group>"; };
+		F0C84A4418E4B47B00496DE6 /* NTJsonIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonIndex.h; sourceTree = "<group>"; };
+		F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonIndex.m; sourceTree = "<group>"; };
+		F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonIndex+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +187,9 @@
 				F051E22A18E34FB0008E0FFD /* NTJsonColumn+Private.h */,
 				F051E22718E34F97008E0FFD /* NTJsonColumn.h */,
 				F051E22818E34F97008E0FFD /* NTJsonColumn.m */,
+				F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */,
+				F0C84A4418E4B47B00496DE6 /* NTJsonIndex.h */,
+				F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */,
 				F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */,
 				F051E21918E29EB9008E0FFD /* NTJsonStore.h */,
 				F051E21A18E29EB9008E0FFD /* NTJsonStore.m */,
@@ -291,6 +298,7 @@
 				F051E1FA18E29A8D008E0FFD /* AppDelegate.m in Sources */,
 				F051E22F18E379F1008E0FFD /* NSArray+NTJsonStore.m in Sources */,
 				F051E21E18E29EE5008E0FFD /* NTJsonCollection.m in Sources */,
+				F0C84A4618E4B47B00496DE6 /* NTJsonIndex.m in Sources */,
 				F051E23218E380B3008E0FFD /* NSDictionary+NTJsonStore.m in Sources */,
 				F051E21B18E29EB9008E0FFD /* NTJsonStore.m in Sources */,
 				F051E1F618E29A8D008E0FFD /* main.m in Sources */,
@@ -490,6 +498,7 @@
 				F051E21418E29A8D008E0FFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F051E21518E29A8D008E0FFD /* Build configuration list for PBXNativeTarget "NTJsonStoreSampleTests" */ = {
 			isa = XCConfigurationList;
@@ -498,6 +507,7 @@
 				F051E21718E29A8D008E0FFD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

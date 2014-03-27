@@ -11,10 +11,6 @@
 #import "NTJsonStore+Private.h"
 
 
-#define LOG(format, ...)            NSLog(format, ##__VA_ARGS__)
-#define LOG_ERROR(format, ...)      NSLog(format, ##__VA_ARGS__)
-
-
 @interface NTJsonStore ()
 {
     sqlite3 *_connection;
@@ -62,9 +58,9 @@
         int status = sqlite3_open_v2([self.storeFilename cStringUsingEncoding:NSUTF8StringEncoding], &_connection, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL);
         
         if ( status == SQLITE_OK )
-            LOG(@"Database opened");
+            LOG_DBG(@"Database opened");
         else
-            LOG_ERROR(@"Error opening database: %d", status);
+            LOG_ERROR(@"Failed to open database: %d", status);
     }
     
     return _connection;
@@ -230,7 +226,7 @@
     {
         _internalCollections = [NSMutableDictionary dictionary];
 
-        sqlite3_stmt *statement = [self statementWithSql:@"SELECT name FROM sqlite_master WHERE type IN ('table','view') AND name NOT LIKE 'sqlite_%' ORDER BY 1;" args:nil];
+        sqlite3_stmt *statement = [self statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1;" args:nil];
         
         int status;
         
@@ -269,15 +265,23 @@
     
     LOG(@"Creating collection: %@", collectionName);
     
-    collection = [[NTJsonCollection alloc] initWithStore:self name:collectionName];
-    
-    if ( ![collection createCollection] )
-        return nil;
+    collection = [[NTJsonCollection alloc] initNewCollectionWithStore:self name:collectionName];
     
     self.internalCollections[collectionName] = collection;
     
     return collection;
 }
 
+
+-(BOOL)ensureSchema
+{
+    for(NTJsonCollection *collection in self.collections)
+    {
+        if ( ![collection ensureSchema] )
+            return NO;
+    }
+    
+    return YES;
+}
 
 @end
