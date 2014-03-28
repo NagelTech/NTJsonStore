@@ -9,6 +9,7 @@ Pod::Spec.new do |s|
   s.source              = { :git => "https://github.com/NagelTech/NTJsonStore.git", :tag => "0.10" }
   s.requires_arc        = true
   s.source_files        = '*.{h,m}'
+  s.private_header_files = '*.h'
   s.public_header_files = 'NTJson{Store|Collection}.h'
   s.libraries           = 'sqlite3'
 end
