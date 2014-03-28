@@ -16,7 +16,7 @@
 {
     // If we find a path, "x.y", parse the element and call ourselves recursively...
     
-    int dotPos = [keyPath rangeOfString:@"."].location;
+    NSUInteger dotPos = [keyPath rangeOfString:@"."].location;
     
     if ( dotPos != NSNotFound)
     {

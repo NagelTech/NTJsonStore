@@ -127,7 +127,7 @@
     if ( ![sql hasSuffix:@";"] )
         sql = [sql stringByAppendingString:@";"];
     
-    int status = sqlite3_prepare_v2(self.connection, [sql cStringUsingEncoding:NSUTF8StringEncoding], sql.length, &statement, NULL);
+    NSUInteger status = sqlite3_prepare_v2(self.connection, [sql cStringUsingEncoding:NSUTF8StringEncoding], (int)sql.length, &statement, NULL);
     
     if (status != SQLITE_OK )
     {
@@ -175,7 +175,7 @@
             
             else if ( [arg isKindOfClass:[NSData class]] )
             {
-                sqlite3_bind_blob(statement, index, [arg bytes], [arg length], SQLITE_TRANSIENT);
+                sqlite3_bind_blob(statement, index, [arg bytes], (int)[arg length], SQLITE_TRANSIENT);
             }
             
             else if ( arg == [NSNull null] )

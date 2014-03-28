@@ -350,11 +350,11 @@
 {
     const int MAX_TRIES = 10;
     
-    int base = self.indexes.count + _pendingIndexes.count;
+    NSInteger base = self.indexes.count + _pendingIndexes.count;
     
     for(int index=0; index<MAX_TRIES; index++)
     {
-        NSString *name = [NSString stringWithFormat:@"%@_%@_%d", (isUnique) ? @"UX" : @"IX", self.name, base+index];
+        NSString *name = [NSString stringWithFormat:@"%@_%@_%ld", (isUnique) ? @"UX" : @"IX", self.name, base+index];
         
         NTJsonIndex *existing = [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return [index.name isEqualToString:name]; }];
         
