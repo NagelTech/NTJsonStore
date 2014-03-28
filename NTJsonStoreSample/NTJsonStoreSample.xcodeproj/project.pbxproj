@@ -27,6 +27,9 @@
 		F051E23218E380B3008E0FFD /* NSDictionary+NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */; };
 		F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */ = {isa = PBXBuildFile; fileRef = F051E23318E3AC8E008E0FFD /* ReceiverData.json */; };
 		F0C84A4618E4B47B00496DE6 /* NTJsonIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */; };
+		F0C84A5018E5C88C00496DE6 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = F0C84A4D18E5C88C00496DE6 /* LICENSE */; };
+		F0C84A5118E5C88C00496DE6 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F0C84A4E18E5C88C00496DE6 /* README.md */; };
+		F0C84A5218E5C88C00496DE6 /* NTJsonStore.podspec in Resources */ = {isa = PBXBuildFile; fileRef = F0C84A4F18E5C88C00496DE6 /* NTJsonStore.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +77,9 @@
 		F0C84A4418E4B47B00496DE6 /* NTJsonIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonIndex.h; sourceTree = "<group>"; };
 		F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonIndex.m; sourceTree = "<group>"; };
 		F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonIndex+Private.h"; sourceTree = "<group>"; };
+		F0C84A4D18E5C88C00496DE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		F0C84A4E18E5C88C00496DE6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		F0C84A4F18E5C88C00496DE6 /* NTJsonStore.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NTJsonStore.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +183,7 @@
 		F051E21818E29E8C008E0FFD /* NTJsonStore */ = {
 			isa = PBXGroup;
 			children = (
+				F0C84A4D18E5C88C00496DE6 /* LICENSE */,
 				F051E22D18E379F1008E0FFD /* NSArray+NTJsonStore.h */,
 				F051E22E18E379F1008E0FFD /* NSArray+NTJsonStore.m */,
 				F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */,
@@ -193,6 +200,8 @@
 				F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */,
 				F051E21918E29EB9008E0FFD /* NTJsonStore.h */,
 				F051E21A18E29EB9008E0FFD /* NTJsonStore.m */,
+				F0C84A4F18E5C88C00496DE6 /* NTJsonStore.podspec */,
+				F0C84A4E18E5C88C00496DE6 /* README.md */,
 			);
 			name = NTJsonStore;
 			path = ..;
@@ -273,8 +282,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0C84A5218E5C88C00496DE6 /* NTJsonStore.podspec in Resources */,
 				F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */,
 				F051E1F418E29A8D008E0FFD /* InfoPlist.strings in Resources */,
+				F0C84A5118E5C88C00496DE6 /* README.md in Resources */,
+				F0C84A5018E5C88C00496DE6 /* LICENSE in Resources */,
 				F051E1FC18E29A8D008E0FFD /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
