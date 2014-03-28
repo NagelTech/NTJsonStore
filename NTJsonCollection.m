@@ -438,6 +438,32 @@
 }
 
 
+-(NSMutableArray *)insertBatch:(NSArray *)items
+{
+    // todo: put this all in a transaction.
+    
+    if ( !items )
+        return nil;
+    
+    NSMutableArray *newItems = [NSMutableArray arrayWithCapacity:items.count];
+    
+    for(NSDictionary *item in items)
+    {
+        NSMutableDictionary *newJson = [self insert:item];
+        
+        if ( !newJson )
+        {
+            // rollback
+            return nil;
+        }
+        
+        [newItems addObject:newJson];
+    }
+    
+    return newItems;
+}
+
+
 -(BOOL)update:(NSDictionary *)json
 {
     [self ensureSchema];
@@ -579,6 +605,12 @@
         return 0;
     
     return sqlite3_changes(self.store.connection);
+}
+
+
+-(int)removeAll
+{
+    return [self removeWhere:nil args:nil];
 }
 
 

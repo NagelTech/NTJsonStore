@@ -26,6 +26,8 @@
 -(BOOL)update:(NSDictionary *)json;
 -(BOOL)remove:(NSDictionary *)json;
 
+-(NSMutableArray *)insertBatch:(NSArray *)items;
+
 -(int)countWhere:(NSString *)where args:(NSArray *)args;
 -(int)count;
 
@@ -33,6 +35,7 @@
 -(NSMutableDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
 
 -(int)removeWhere:(NSString *)where args:(NSArray *)args;
+-(int)removeAll;
 
 -(NSString *)description;
 
