@@ -81,23 +81,34 @@
     
     // Convert Category ID's to numeric...
     
-    int categoryIndex = 1;
-    
-    for(NSMutableDictionary *category in [categoriesCollection findWhere:nil args:nil orderBy:@"[id] desc"])
+    for(NSMutableDictionary *category in [categoriesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"])
     {
         NSArray *messages = [messagesCollection findWhere:@"[categoryId]=?" args:@[category[@"id"]] orderBy:nil];
         
-        category[@"id"] = @(categoryIndex);
+        category[@"id"] = category[@"__rowid__"];
         
         [categoriesCollection update:category];
         
         for(NSMutableDictionary *message in messages)
         {
-            message[@"categoryId"] = @(categoryIndex);
+            message[@"categoryId"] = category[@"id"];
             [messagesCollection update:message];
         }
+    }
+    
+    for(NSMutableDictionary *source in [sourcesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"])
+    {
+        NSArray *messages = [messagesCollection findWhere:@"[sourceId]=?" args:@[source[@"id"]] orderBy:nil];
         
-        ++categoryIndex;
+        source[@"id"] = source[@"__rowid__"];
+        
+        [sourcesCollection update:source];
+        
+        for(NSMutableDictionary *message in messages)
+        {
+            message[@"sourceId"] = source[@"id"];
+            [messagesCollection update:message];
+        }
     }
     
     NSLog(@"After category update");

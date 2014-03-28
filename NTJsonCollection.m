@@ -271,6 +271,11 @@
         if ( [columnName hasSuffix:@"]"] )
             columnName = [columnName substringToIndex:columnName.length-1];
         
+        // Ignore our row id, it's always available...
+        
+        if ( [columnName isEqualToString:@"__rowid__"] )
+            return ;
+        
         // check existing column list...
         
         NTJsonColumn *column = [self.columns NTJsonStore_find:^BOOL(NTJsonColumn *column) { return [column.name isEqualToString:columnName]; }];
