@@ -16,7 +16,7 @@
 #import "NTJsonCollection+Private.h"
 #import "NTJsonColumn+Private.h"
 #import "NTJsonIndex+Private.h"
-
+#import "NTJsonCompressor.h"
 
 #define LOG(format, ...)            NSLog(format, ##__VA_ARGS__)
 #define LOG_ERROR(format, ...)      NSLog(@"Error: " format, ##__VA_ARGS__)
@@ -29,6 +29,5 @@
 
 -(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
-
 
 @end
