@@ -491,7 +491,7 @@
     
     long long rowid = [json[@"__rowid__"] longLongValue];
 
-    return [self.store execSql:[NSString stringWithFormat:@"DELETE [%@] WHERE __rowid__ = ?", self.name] args:@[@(rowid)]];
+    return [self.store execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE __rowid__ = ?", self.name] args:@[@(rowid)]];
 }
 
 
@@ -603,7 +603,7 @@
     
     [self ensureSchema];
     
-    NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE [%@] ", self.name];
+    NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE FROM [%@] ", self.name];
     
     if ( where )
         [sql appendFormat:@" WHERE %@", where];
