@@ -405,7 +405,7 @@
 #pragma mark - Data Access Methods
 
 
--(NSMutableDictionary *)insert:(NSDictionary *)json
+-(NTJsonRowId)insert:(NSDictionary *)json
 {
     [self ensureSchema];
     
@@ -426,41 +426,33 @@
     [self extractValuesInColumns:self.columns fromJson:json intoArray:values];
     
     if ( ![self.store execSql:sql args:values] )
-        return nil;
+        return 0;
     
-    long long rowid = sqlite3_last_insert_rowid(self.store.connection);
+    NTJsonRowId rowid = sqlite3_last_insert_rowid(self.store.connection);
     
-    NSMutableDictionary *newJson = [json mutableCopy];
-    
-    newJson[@"__rowid__"] = @(rowid);
-    
-    return newJson;
+    return rowid;
 }
 
 
--(NSMutableArray *)insertBatch:(NSArray *)items
+-(BOOL)insertBatch:(NSArray *)items
 {
     // todo: put this all in a transaction.
     
     if ( !items )
-        return nil;
-    
-    NSMutableArray *newItems = [NSMutableArray arrayWithCapacity:items.count];
+        return YES;
     
     for(NSDictionary *item in items)
     {
-        NSMutableDictionary *newJson = [self insert:item];
+        NTJsonRowId rowid = [self insert:item];
         
-        if ( !newJson )
+        if ( !rowid )
         {
             // rollback
-            return nil;
+            return NO;
         }
-        
-        [newItems addObject:newJson];
     }
     
-    return newItems;
+    return YES;
 }
 
 
@@ -558,10 +550,10 @@
     
     while ( (status=sqlite3_step(selectStatement)) == SQLITE_ROW )
     {
-        long long rowid = sqlite3_column_int64(selectStatement, 0);
+        NTJsonRowId rowid = sqlite3_column_int64(selectStatement, 0);
         NSData *jsonData = [NSData dataWithBytes:sqlite3_column_blob(selectStatement, 1) length:sqlite3_column_bytes(selectStatement, 1)];
         
-        NSMutableDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:nil];
         
         if ( !json )
         {
@@ -571,18 +563,23 @@
         
         // Make sure __rowid__ is valid and correct.
         
-        json[@"__rowid__"] = @(rowid);
+        if (  ![json[@"__rowId__"] isEqualToNumber:@(rowid)] )
+        {
+            NSMutableDictionary *mutableJson = [json mutableCopy];
+            mutableJson[@"__rowid__"] = @(rowid);
+            json = [mutableJson copy];
+        }
         
         [items addObject:json];
     }
     
     sqlite3_finalize(selectStatement);
 
-    return items;
+    return [items copy];
 }
 
 
--(NSMutableDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args
+-(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args
 {
     NSArray *items = [self findWhere:where args:args orderBy:nil];
     

@@ -6,11 +6,13 @@ NTJsonStore
 To Do
 =====
 
- - Return only immutable objects to aid caching/performance. Tune for reading data, not writing it.
-
  - Cache JSON objects. Only deserialize and return an object once. (While in memory, we can always return the same object.)
    Cache disposed objects as well for a defined amount of time. Update the cache on insert/update.
    
+ - Threading.
+ 
+ - Error returns/handling.
+
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of tems to maintain a master list of keys.
    
@@ -22,8 +24,9 @@ To Do
 
  - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
  
+ - Aggregate returns, ie "sum(user.age)"
  
- 
+
 Don't Do
 ========
 

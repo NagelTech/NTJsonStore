@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 
 
+typedef int64_t NTJsonRowId;
+
 @class NTJsonStore;
 
 
@@ -22,17 +24,17 @@
 -(void)addQueryableFields:(NSString *)fields;
 -(BOOL)ensureSchema;
 
--(NSMutableDictionary *)insert:(NSDictionary *)json;
+-(NTJsonRowId)insert:(NSDictionary *)json;
 -(BOOL)update:(NSDictionary *)json;
 -(BOOL)remove:(NSDictionary *)json;
 
--(NSMutableArray *)insertBatch:(NSArray *)items;
+-(BOOL)insertBatch:(NSArray *)items;
 
 -(int)countWhere:(NSString *)where args:(NSArray *)args;
 -(int)count;
 
 -(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy;
--(NSMutableDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
+-(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
 
 -(int)removeWhere:(NSString *)where args:(NSArray *)args;
 -(int)removeAll;
