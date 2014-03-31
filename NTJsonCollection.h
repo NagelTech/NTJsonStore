@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "NTJsonStoreTypes.h"
 
-typedef int64_t NTJsonRowId;
 
 @class NTJsonStore;
 

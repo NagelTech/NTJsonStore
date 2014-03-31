@@ -17,6 +17,7 @@
     NSString *_name;
     NSArray *_columns;
     NSArray *_indexes;
+    NTJsonObjectCache *_objectCache;
     
     NSMutableArray *_pendingColumns;
     NSMutableArray *_pendingIndexes;
@@ -39,6 +40,7 @@
     {
         _store = store;
         _name = name;
+        _objectCache = [[NTJsonObjectCache alloc] init];
         _columns = nil; // these are lazy loaded
         _indexes = nil; // lazy load
         
@@ -551,23 +553,31 @@
     while ( (status=sqlite3_step(selectStatement)) == SQLITE_ROW )
     {
         NTJsonRowId rowid = sqlite3_column_int64(selectStatement, 0);
-        NSData *jsonData = [NSData dataWithBytes:sqlite3_column_blob(selectStatement, 1) length:sqlite3_column_bytes(selectStatement, 1)];
         
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:nil];
+        NSDictionary *json = [_objectCache jsonWithRowId:rowid];
         
         if ( !json )
         {
-            LOG_ERROR(@"Error: Unable to parse JSON for %@:%lld", self.name, rowid);
-            continue;
-        }
-        
-        // Make sure __rowid__ is valid and correct.
-        
-        if (  ![json[@"__rowId__"] isEqualToNumber:@(rowid)] )
-        {
-            NSMutableDictionary *mutableJson = [json mutableCopy];
-            mutableJson[@"__rowid__"] = @(rowid);
-            json = [mutableJson copy];
+            NSData *jsonData = [NSData dataWithBytes:sqlite3_column_blob(selectStatement, 1) length:sqlite3_column_bytes(selectStatement, 1)];
+            
+            NSDictionary *rawJson = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:nil];
+            
+            if ( !rawJson )
+            {
+                LOG_ERROR(@"Error: Unable to parse JSON for %@:%lld", self.name, rowid);
+                continue;
+            }
+            
+            // Make sure __rowid__ is valid and correct.
+            
+            if (  ![rawJson[@"__rowId__"] isEqualToNumber:@(rowid)] )
+            {
+                NSMutableDictionary *mutableJson = [rawJson mutableCopy];
+                mutableJson[@"__rowid__"] = @(rowid);
+                rawJson = [mutableJson copy];
+            }
+            
+            json = [_objectCache addJson:rawJson withRowId:rowid];
         }
         
         [items addObject:json];
