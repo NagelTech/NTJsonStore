@@ -10,6 +10,17 @@
 #import "NTJsonStore+Private.h"
 
 
+//#define DEBUG_CACHE
+
+
+#ifdef DEBUG_CACHE
+#   define CACHE_LOG(format, ...) LOG_DBG(format, ##__VA_ARGS__)
+#else
+#   define CACHE_LOG(format, ...)
+#endif
+
+
+
 static const int DEFAULT_CACHE_SIZE = 50;
 
 
@@ -165,7 +176,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
 
 -(void)proxyDeallocedForCacheItem:(NTJsonObjectCacheItem *)cacheItem
 {
-    LOG(@"Caching - %d", (int)cacheItem.rowId);
+    CACHE_LOG(@"Caching - %d", (int)cacheItem.rowId);
     
     cacheItem.isInUse = NO;
     [_cachedItems addObject:cacheItem]; // newest are at end of the list.
@@ -181,20 +192,20 @@ static const int DEFAULT_CACHE_SIZE = 50;
     
     if ( !item )
     {
-        LOG(@"Cache miss - %d", (int)rowId);
+        CACHE_LOG(@"Cache miss - %d", (int)rowId);
         return nil;
     }
     
     if ( !item.isInUse )
     {
-        LOG(@"Cache Hit (not in use) - %d", (int)rowId);
+        CACHE_LOG(@"Cache Hit (not in use) - %d", (int)rowId);
         // coming back into action!
         item.isInUse = YES;
         [_cachedItems removeObjectIdenticalTo:item];    // it is no longer in our cache, since it's active
     }
     else
     {
-        LOG(@"Cache Hit (already in use) - %d", (int)rowId);
+        CACHE_LOG(@"Cache Hit (already in use) - %d", (int)rowId);
     }
     
     return item.proxyObject;
@@ -205,7 +216,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
 {
     NTJsonObjectCacheItem *item = [[NTJsonObjectCacheItem alloc] initWithCache:self rowId:rowId json:json];
     
-    LOG(@"adding - %d", (int)rowId);
+    CACHE_LOG(@"adding - %d", (int)rowId);
     
     _items[@(rowId)] = item;
     item.isInUse = YES;
@@ -224,7 +235,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
     {
         NTJsonObjectCacheItem *item = _cachedItems[0];  // grab oldest...
         
-        LOG(@"purging - %d", (int)item.rowId);
+        CACHE_LOG(@"purging - %d", (int)item.rowId);
         
         // remove it...
         

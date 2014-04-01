@@ -16,7 +16,6 @@
 #import "NTJsonCollection+Private.h"
 #import "NTJsonColumn+Private.h"
 #import "NTJsonIndex+Private.h"
-#import "NTJsonObjectProxy.h"
 #import "NTJsonObjectCache.h"
 
 
