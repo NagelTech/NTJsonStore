@@ -11,6 +11,39 @@
 #import "NTJsonStore.h"
 
 
+static id mutableDeepCopy(id value)
+{
+    if ( [value isKindOfClass:[NSArray class]] )
+    {
+        NSArray *array = value;
+        NSMutableArray *result = [NSMutableArray arrayWithCapacity:array.count];
+        
+        for(id item in array)
+            [result addObject:mutableDeepCopy(item)];
+        
+        return result;
+    }
+    
+    else if ( [value isKindOfClass:[NSDictionary class]] )
+    {
+        NSDictionary *dictionary = value;
+        NSMutableDictionary *result = [NSMutableDictionary dictionaryWithCapacity:dictionary.count];
+        
+        for(id key in dictionary.allKeys)
+        {
+            id item = dictionary[key];
+            
+            result[key] = mutableDeepCopy(item);
+        }
+        
+        return result;
+    }
+    
+    else
+        return value;
+}
+
+
 @implementation AppDelegate
 
 
@@ -81,9 +114,9 @@
     
     // Convert Category ID's to numeric...
     
-    for(NSMutableDictionary *category in [categoriesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"])
+    for(NSMutableDictionary *category in mutableDeepCopy([categoriesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"]))
     {
-        NSArray *messages = [messagesCollection findWhere:@"[categoryId]=?" args:@[category[@"id"]] orderBy:nil];
+        NSArray *messages = mutableDeepCopy([messagesCollection findWhere:@"[categoryId]=?" args:@[category[@"id"]] orderBy:nil]);
         
         category[@"id"] = category[@"__rowid__"];
         
@@ -96,9 +129,9 @@
         }
     }
     
-    for(NSMutableDictionary *source in [sourcesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"])
+    for(NSMutableDictionary *source in mutableDeepCopy([sourcesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"]))
     {
-        NSArray *messages = [messagesCollection findWhere:@"[sourceId]=?" args:@[source[@"id"]] orderBy:nil];
+        NSArray *messages = mutableDeepCopy([messagesCollection findWhere:@"[sourceId]=?" args:@[source[@"id"]] orderBy:nil]);
         
         source[@"id"] = source[@"__rowid__"];
         
