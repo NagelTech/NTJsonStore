@@ -462,7 +462,7 @@
 {
     [self ensureSchema];
     
-    long long rowid = [json[@"__rowid__"] longLongValue];
+    NTJsonRowId rowid = [json[@"__rowid__"] longLongValue];
     
     NSMutableArray *columnNames = [NSMutableArray arrayWithObject:@"__json__"];
     [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return column.name; }]];
@@ -481,7 +481,14 @@
     
     [values addObject:@(rowid)];
     
-    return [self.store execSql:sql args:values];
+    BOOL success = [self.store execSql:sql args:values];
+    
+    if ( success )
+    {
+        [_objectCache addJson:json withRowId:rowid];
+    }
+    
+    return success;
 }
 
 
