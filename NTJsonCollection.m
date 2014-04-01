@@ -508,10 +508,10 @@
 
     [self ensureSchema];
     
-    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT COUNT(*) FROM [%@] ", self.name];
+    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT COUNT(*) FROM [%@]", self.name];
     
     if ( where )
-        [sql appendString:where];
+        [sql appendFormat:@" WHERE %@", where];
     
     sqlite3_stmt *statement = [self.store statementWithSql:sql args:args];
     
