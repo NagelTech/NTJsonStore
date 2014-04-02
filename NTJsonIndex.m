@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NTJsonIndex.h"
+#import "NTJsonStore+Private.h"
 
 
 @interface NTJsonIndex ()

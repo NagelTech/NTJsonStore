@@ -3,22 +3,23 @@ NTJsonStore
 
 [In development] A No-SQL-like JSON data store, transparently leveraging SQLITE for storage and indexing.
 
+
 To Do
 =====
 
- - Cache JSON objects. Only deserialize and return an object once. (While in memory, we can always return the same object.)
-   Cache disposed objects as well for a defined amount of time. Update the cache on insert/update.
-   
  - Threading.
  
  - Error returns/handling.
 
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
-   Take advantage of the fact we have a collection of tems to maintain a master list of keys.
+   Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
    
- - Cache query responses. cache Query responses (array of __rowid__'s) and avoid making unnecessary calls. Flush cache on insert/update.
+ - Cache query responses. cache Query responses (array of __rowid__'s) and avoid making unnecessary calls. Flush cache on insert/update/delete.
  
- - Cache sqlite queries. (Well maybe. Are we caching enough already?)
+ - Add simple local query support, integrated into query cache. Simple queries, such as get an object by a key can be handled without goingto SQLIITE
+   each time. (Load a hask of keys -> rowid's once then do a lookup.)
+   
+ - intelligent query cache clearing. Notice what columns have changed and only clear impacted queries. (Maybe not necesary?)
  
  - Fucking dates in JSON. What to do?
 
@@ -31,4 +32,11 @@ Don't Do
 ========
 
  - Support partial responses (return subset of JSON.) This will complicate caching and may actually degrade performance overall.
+ 
+ 
+Done
+====
 
+ - Cache JSON objects. Only deserialize and return an object once. (While in memory, we can always return the same object.)
+   Cache disposed objects as well for a defined amount of time. Update the cache on insert/update.
+   

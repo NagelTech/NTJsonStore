@@ -6,10 +6,8 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NTJsonColumn.h"
 
-
-@interface NTJsonColumn (Private)
+@interface NTJsonColumn : NSObject
 
 @property (nonatomic,readonly) NSString *name;
 

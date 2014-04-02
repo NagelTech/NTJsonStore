@@ -67,7 +67,6 @@
 		F051E21F18E33B13008E0FFD /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonStore+Private.h"; sourceTree = "<group>"; };
 		F051E22418E341BB008E0FFD /* NTJsonCollection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonCollection+Private.h"; sourceTree = "<group>"; };
-		F051E22718E34F97008E0FFD /* NTJsonColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonColumn.h; sourceTree = "<group>"; };
 		F051E22818E34F97008E0FFD /* NTJsonColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonColumn.m; sourceTree = "<group>"; };
 		F051E22A18E34FB0008E0FFD /* NTJsonColumn+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonColumn+Private.h"; sourceTree = "<group>"; };
 		F051E22D18E379F1008E0FFD /* NSArray+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+NTJsonStore.h"; sourceTree = "<group>"; };
@@ -75,13 +74,12 @@
 		F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NTJsonStore.h"; sourceTree = "<group>"; };
 		F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NTJsonStore.m"; sourceTree = "<group>"; };
 		F051E23318E3AC8E008E0FFD /* ReceiverData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ReceiverData.json; sourceTree = "<group>"; };
-		F0C84A4418E4B47B00496DE6 /* NTJsonIndex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonIndex.h; sourceTree = "<group>"; };
 		F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonIndex.m; sourceTree = "<group>"; };
 		F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonIndex+Private.h"; sourceTree = "<group>"; };
 		F0C84A4D18E5C88C00496DE6 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		F0C84A4E18E5C88C00496DE6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		F0C84A4F18E5C88C00496DE6 /* NTJsonStore.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NTJsonStore.podspec; sourceTree = "<group>"; };
-		F0C84A5F18E9DD3E00496DE6 /* NTJsonObjectCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonObjectCache.h; sourceTree = "<group>"; };
+		F0C84A5F18E9DD3E00496DE6 /* NTJsonObjectCache+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonObjectCache+Private.h"; sourceTree = "<group>"; };
 		F0C84A6018E9DD3E00496DE6 /* NTJsonObjectCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonObjectCache.m; sourceTree = "<group>"; };
 		F0C84A6218E9DDE000496DE6 /* NTJsonStoreTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonStoreTypes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -196,12 +194,10 @@
 				F051E21C18E29EE5008E0FFD /* NTJsonCollection.h */,
 				F051E21D18E29EE5008E0FFD /* NTJsonCollection.m */,
 				F051E22A18E34FB0008E0FFD /* NTJsonColumn+Private.h */,
-				F051E22718E34F97008E0FFD /* NTJsonColumn.h */,
 				F051E22818E34F97008E0FFD /* NTJsonColumn.m */,
 				F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */,
-				F0C84A4418E4B47B00496DE6 /* NTJsonIndex.h */,
 				F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */,
-				F0C84A5F18E9DD3E00496DE6 /* NTJsonObjectCache.h */,
+				F0C84A5F18E9DD3E00496DE6 /* NTJsonObjectCache+Private.h */,
 				F0C84A6018E9DD3E00496DE6 /* NTJsonObjectCache.m */,
 				F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */,
 				F051E21918E29EB9008E0FFD /* NTJsonStore.h */,

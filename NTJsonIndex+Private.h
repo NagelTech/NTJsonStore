@@ -6,10 +6,8 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NTJsonIndex.h"
 
-
-@interface NTJsonIndex (Private)
+@interface NTJsonIndex : NSObject
 
 @property (nonatomic,readonly) BOOL isUnique;
 @property (nonatomic,readonly) NSString *name;

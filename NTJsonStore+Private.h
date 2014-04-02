@@ -16,7 +16,7 @@
 #import "NTJsonCollection+Private.h"
 #import "NTJsonColumn+Private.h"
 #import "NTJsonIndex+Private.h"
-#import "NTJsonObjectCache.h"
+#import "NTJsonObjectCache+Private.h"
 
 
 #define LOG(format, ...)            NSLog(format, ##__VA_ARGS__)
