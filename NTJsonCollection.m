@@ -87,7 +87,7 @@
     LOG_DBG(@"Adding table: %@", self.name);
     
     _isNewCollection = NO;
-    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([__rowid__] integer primary key, __json__ blob);", self.name];
+    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([__rowid__] INTEGER PRIMARY KEY AUTOINCREMENT, [__json__] BLOB);", self.name];
     
     _columns = [NSArray array];
     _indexes = [NSArray array];
@@ -116,12 +116,12 @@
     
     // Now we need to populate the data...
     
-    sqlite3_stmt *selectStatement = [self.store statementWithSql:[NSString stringWithFormat:@"SELECT __rowid__, __json__ FROM [%@]", self.name] args:nil];
+    sqlite3_stmt *selectStatement = [self.store statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
     
     if ( !selectStatement )
         return NO;  // todo: cleanup here somehow? transaction?
     
-    NSString *updateSql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE __rowid__ = ?;", self.name, [[_pendingColumns NTJsonStore_transform:^id(NTJsonColumn *column)
+    NSString *updateSql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [__rowid__] = ?;", self.name, [[_pendingColumns NTJsonStore_transform:^id(NTJsonColumn *column)
                                                                                                               {
                                                                                                                   return [NSString stringWithFormat:@"[%@] = ?", column.name];
                                                                                                               }] componentsJoinedByString:@", "]];
@@ -467,7 +467,7 @@
     NSMutableArray *columnNames = [NSMutableArray arrayWithObject:@"__json__"];
     [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return column.name; }]];
     
-    NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE __rowid__ = ?;",
+    NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [__rowid__] = ?;",
                      self.name,
                      [[columnNames NTJsonStore_transform:^id(NSString *columnName) { return [NSString stringWithFormat:@"[%@] = ?", columnName]; }] componentsJoinedByString:@", "]];
     
@@ -484,9 +484,7 @@
     BOOL success = [self.store execSql:sql args:values];
     
     if ( success )
-    {
         [_objectCache addJson:json withRowId:rowid];
-    }
     
     return success;
 }
@@ -498,7 +496,12 @@
     
     long long rowid = [json[@"__rowid__"] longLongValue];
 
-    return [self.store execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE __rowid__ = ?", self.name] args:@[@(rowid)]];
+    BOOL success = [self.store execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [__rowid__] = ?", self.name] args:@[@(rowid)]];
+    
+    if ( success )
+        [_objectCache removeObjectWithRowId:rowid];
+    
+    return success;
 }
 
 
@@ -541,7 +544,7 @@
     
     // Ok, now we can actually do the query...
     
-    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT __rowid__, __json__ FROM %@", self.name];
+    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM %@", self.name];
     
     if ( where )
         [sql appendFormat:@" WHERE %@", where];
@@ -618,7 +621,12 @@
     if ( ![self.store execSql:sql args:args] )
         return 0;
     
-    return sqlite3_changes(self.store.connection);
+    int count = sqlite3_changes(self.store.connection);
+    
+    // note: we may leave objects in the cache that were deleted, but the rowid will not be re-used (thanks to AUTOINCREMENT PK)
+    // so it should be eventually cleaned out of the cache from lack of use.
+    
+    return count;
 }
 
 

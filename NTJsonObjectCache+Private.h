@@ -20,7 +20,9 @@
 
 -(NSDictionary *)jsonWithRowId:(NTJsonRowId)rowId;
 -(NSDictionary *)addJson:(NSDictionary *)json withRowId:(NTJsonRowId)rowId;
+-(void)removeObjectWithRowId:(NTJsonRowId)rowId;
 
 -(void)flush;
+-(void)removeAll;
 
 @end

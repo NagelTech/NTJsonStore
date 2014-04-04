@@ -48,7 +48,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
     NTJsonObjectProxy __weak *_proxyObject;
 }
 
-@property (nonatomic,readonly) NTJsonObjectCache *cache;
+@property (nonatomic,readwrite,weak) NTJsonObjectCache *cache;
 @property (nonatomic,readonly) NTJsonRowId rowId;
 @property (nonatomic,readonly) NSDictionary *json;
 
@@ -214,14 +214,39 @@ static const int DEFAULT_CACHE_SIZE = 50;
 
 -(NSDictionary *)addJson:(NSDictionary *)json withRowId:(NTJsonRowId)rowId
 {
-    NTJsonObjectCacheItem *item = [[NTJsonObjectCacheItem alloc] initWithCache:self rowId:rowId json:json];
-    
     CACHE_LOG(@"adding - %d", (int)rowId);
+
+    NTJsonObjectCacheItem *currentItem = _items[@(rowId)];
+    
+    if ( currentItem )
+    {
+        [self removeCacheItem:currentItem];
+        currentItem = nil;
+    }
+    
+    NTJsonObjectCacheItem *item = [[NTJsonObjectCacheItem alloc] initWithCache:self rowId:rowId json:json];
     
     _items[@(rowId)] = item;
     item.isInUse = YES;
     
     return item.proxyObject;
+}
+
+
+-(void)removeCacheItem:(NTJsonObjectCacheItem *)item
+{
+    item.cache = nil;   // unlink from cache so proxyDeallocedForCacheItem: will not be called
+    [_cachedItems removeObjectIdenticalTo:item];
+    [_items removeObjectForKey:@(item.rowId)];
+}
+
+
+-(void)removeObjectWithRowId:(NTJsonRowId)rowId
+{
+    NTJsonObjectCacheItem *item = _items[@(rowId)];
+    
+    if ( item )
+        [self removeCacheItem:item];
 }
 
 
@@ -239,8 +264,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
         
         // remove it...
         
-        [_cachedItems removeObjectAtIndex:0];
-        [_items removeObjectForKey:@(item.rowId)];
+        [self removeCacheItem:item];
     }
 }
 
@@ -248,6 +272,13 @@ static const int DEFAULT_CACHE_SIZE = 50;
 -(void)flush
 {
     [self purgeCacheWithFlushAll:YES];
+}
+
+
+-(void)removeAll
+{
+    for(NTJsonObjectCacheItem *item in _items.allValues)
+        [self removeCacheItem:item];
 }
 
 
