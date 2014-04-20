@@ -16,8 +16,8 @@ To Do
    
  - Cache query responses. cache Query responses (array of __rowid__'s) and avoid making unnecessary calls. Flush cache on insert/update/delete.
  
- - Add simple local query support, integrated into query cache. Simple queries, such as get an object by a key can be handled without goingto SQLIITE
-   each time. (Load a hask of keys -> rowid's once then do a lookup.)
+ - Add simple local query support, integrated into query cache. Simple queries, such as get an object by a key can be handled without going to SQLIITE
+   each time. (Load a hash of keys -> rowid's once then do a lookup.)
    
  - intelligent query cache clearing. Notice what columns have changed and only clear impacted queries. (Maybe not necesary?)
  
@@ -26,6 +26,12 @@ To Do
  - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
  
  - Aggregate returns, ie "sum(user.age)"
+ 
+ - Add method to determine if JSON is the current value. (NTJsonCollection isJsonCurrent:) This will enable higher-level caching (Model level)
+ 
+ - Add notifications when collections or objects are modified. This also enables caching.
+ 
+ - Add notifications when query results are changed. (This becomes possible with robus query caching.)
  
 
 Don't Do
