@@ -29,7 +29,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
 
 @interface NTJsonObjectProxy : NSProxy
 {
-    NTJsonObjectCacheItem __weak *_cacheItem;
+    NTJsonObjectCacheItem *_cacheItem;
 }
 
 -(id)initWithCacheItem:(NTJsonObjectCacheItem *)cacheItem;
