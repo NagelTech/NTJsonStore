@@ -33,6 +33,7 @@
 -(int)countWhere:(NSString *)where args:(NSArray *)args;
 -(int)count;
 
+-(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit;
 -(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy;
 -(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args;
 

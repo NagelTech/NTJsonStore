@@ -535,7 +535,7 @@
 }
 
 
--(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy
+-(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
 {
     [self scanSqlForNewColumns:where];
     [self scanSqlForNewColumns:orderBy];
@@ -551,6 +551,9 @@
     
     if ( orderBy )
         [sql appendFormat:@" ORDER BY %@", orderBy];
+    
+    if ( limit > 0 )
+        [sql appendFormat:@" LIMIT %d", limit];
     
     sqlite3_stmt *selectStatement = [self.store statementWithSql:sql args:args];
     
@@ -599,9 +602,15 @@
 }
 
 
+-(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy
+{
+    return [self findWhere:where args:args orderBy:orderBy limit:0];
+}
+
+
 -(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args
 {
-    NSArray *items = [self findWhere:where args:args orderBy:nil];
+    NSArray *items = [self findWhere:where args:args orderBy:nil limit:1];
     
     return (items.count == 1) ? items[0] : nil;
 }
