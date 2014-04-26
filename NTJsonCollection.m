@@ -12,6 +12,7 @@
 @interface NTJsonCollection ()
 {
     NTJsonStore *_store;
+    NTJsonSqlConnection *_connection;
 
     BOOL _isNewCollection;
     NSString *_name;
@@ -48,6 +49,7 @@
         
         _pendingColumns = [NSMutableArray array];
         _pendingIndexes = [NSMutableArray array];
+        _connection = [[NTJsonSqlConnection alloc] initWithFilename:store.storeFilename connectionName:self.name];
     }
     
     return self;
@@ -75,12 +77,6 @@
 -(NSString *)description
 {
     return self.name;
-}
-
-
--(NTJsonSqlConnection *)connection
-{
-    return self.store.connection;   // for now.
 }
 
 
@@ -197,7 +193,7 @@
 }
 
 
--(BOOL)ensureSchema
+-(BOOL)_ensureSchema
 {
     if ( ![self schema_createCollection] )
         return NO;
@@ -212,6 +208,18 @@
 }
 
 
+-(BOOL)ensureSchema
+{
+    __block BOOL success;
+    
+    [self.connection dispatchSync:^
+    {
+        success = [self _ensureSchema];
+    }];
+    
+    return success;
+}
+
 #pragma mark - Column Support
 
 
@@ -219,27 +227,33 @@
 {
     // if we don't have our list of columns, let's extract them...
 
-    if ( !_columns )
+    @synchronized(self)
     {
-        NSMutableArray *columns = [NSMutableArray array];
-        sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
-        
-        int status;
-        
-        while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+        if ( !_columns )
         {
-            NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
-            
-            if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
-                continue;
-            
-            [columns addObject:[NTJsonColumn columnWithName:columnName]];
+            [self.connection dispatchSync:^
+            {
+                NSMutableArray *columns = [NSMutableArray array];
+                sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
+                
+                int status;
+                
+                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                {
+                    NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
+                    
+                    if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
+                        continue;
+                    
+                    [columns addObject:[NTJsonColumn columnWithName:columnName]];
+                }
+                
+                _columns = [columns copy];
+            }];
         }
         
-        _columns = [columns copy];
+        return _columns;
     }
-    
-    return _columns;
 }
 
 
@@ -322,37 +336,43 @@
 
 -(NSArray *)indexes
 {
-    if ( !_indexes )
+    @synchronized(self)
     {
-        NSMutableArray *indexes = [NSMutableArray array];
-        
-        sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
-        
-        int status;
-        
-        while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+        if ( !_indexes )
         {
-            NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
-            
-            if ( !sql.length )
-                continue ;
-            
-            NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
-            
-            if ( !index )
+            [self.connection dispatchSync:^
             {
-                LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
-                continue;
-            }
-            
-            [indexes addObject:index];
-            
+                NSMutableArray *indexes = [NSMutableArray array];
+                
+                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
+                
+                int status;
+                
+                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                {
+                    NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
+                    
+                    if ( !sql.length )
+                        continue ;
+                    
+                    NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
+                    
+                    if ( !index )
+                    {
+                        LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
+                        continue;
+                    }
+                    
+                    [indexes addObject:index];
+                    
+                }
+                
+                _indexes = [indexes copy];
+            }];
         }
         
-        _indexes = [indexes copy];
+        return _indexes;
     }
-    
-    return _indexes;
 }
 
 
@@ -381,22 +401,24 @@
 
 -(void)addIndexWithKeys:(NSString *)keys isUnique:(BOOL)isUnique
 {
-    
-    // First off, let's see if it already exists...
-    
-    if ( [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
-        return ;
-    
-    if ( [_pendingIndexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
-        return ;
-    
-    [self scanSqlForNewColumns:keys];
-    
-    NSString *name = [self createIndexNameWithIsUnique:isUnique];
-    
-    NTJsonIndex *index = [NTJsonIndex indexWithName:name keys:keys isUnique:isUnique];
-    
-    [_pendingIndexes addObject:index];
+    @synchronized(self)
+    {
+        // First off, let's see if it already exists...
+        
+        if ( [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
+            return ;
+        
+        if ( [_pendingIndexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
+            return ;
+        
+        [self scanSqlForNewColumns:keys];
+        
+        NSString *name = [self createIndexNameWithIsUnique:isUnique];
+        
+        NTJsonIndex *index = [NTJsonIndex indexWithName:name keys:keys isUnique:isUnique];
+        
+        [_pendingIndexes addObject:index];
+    }
 }
 
 
@@ -415,9 +437,22 @@
 #pragma mark - Data Access Methods
 
 
--(NTJsonRowId)insert:(NSDictionary *)json
+static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQueue)
 {
-    [self ensureSchema];
+    if ( completionQueue )
+        return completionQueue;
+    
+    else if ( [NSThread isMainThread] )
+        return dispatch_get_main_queue();
+    
+    else
+        return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+
+-(NTJsonRowId)_insert:(NSDictionary *)json
+{
+    [self _ensureSchema];
     
     NSMutableArray *columnNames = [NSMutableArray arrayWithObject:@"__json__"];
     [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return column.name; }]];
@@ -444,7 +479,45 @@
 }
 
 
--(BOOL)insertBatch:(NSArray *)items
+-(void)beginInsert:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NTJsonRowId rowid))completionHandler
+{
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        NTJsonRowId rowid = [self _insert:json];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(rowid);
+            });
+        }
+    }];
+}
+
+
+-(void)beginInsert:(NSDictionary *)json completionHandler:(void (^)(NTJsonRowId rowid))completionHandler
+{
+    [self beginInsert:json completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(NTJsonRowId)insert:(NSDictionary *)json
+{
+    __block NTJsonRowId rowid;
+    
+    [self.connection dispatchSync:^
+    {
+        rowid = [self _insert:json];
+    }];
+    
+    return rowid;
+}
+
+
+-(BOOL)_insertBatch:(NSArray *)items
 {
     // todo: put this all in a transaction.
     
@@ -466,9 +539,47 @@
 }
 
 
--(BOOL)update:(NSDictionary *)json
+-(void)beginInsertBatch:(NSArray *)items completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
-    [self ensureSchema];
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        BOOL success = [self _insertBatch:items];
+       
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(success);
+            });
+        }
+    }];
+}
+
+
+-(void)beginInsertBatch:(NSArray *)items completionHandler:(void (^)(BOOL success))completionHandler
+{
+    [self beginInsertBatch:items completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(BOOL)insertBatch:(NSArray *)items
+{
+    __block BOOL success;
+    
+    [self.connection dispatchSync:^
+    {
+        success = [self _insertBatch:items];
+    }];
+    
+    return success;
+}
+
+
+-(BOOL)_update:(NSDictionary *)json
+{
+    [self _ensureSchema];
     
     NTJsonRowId rowid = [json[@"__rowid__"] longLongValue];
     
@@ -498,9 +609,48 @@
 }
 
 
--(BOOL)remove:(NSDictionary *)json
+-(void)beginUpdate:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
-    [self ensureSchema];
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        BOOL success = [self _update:json];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(success);
+            });
+        }
+    }];
+}
+
+
+-(void)beginUpdate:(NSDictionary *)json completionHandler:(void (^)(BOOL success))completionHandler
+{
+    [self beginUpdate:json completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(BOOL)update:(NSDictionary *)json
+{
+    __block BOOL success;
+    
+    [self.connection dispatchSync:^
+                  {
+                      success = [self _update:json];
+                  }];
+    
+    return success;
+}
+
+
+
+-(BOOL)_remove:(NSDictionary *)json
+{
+    [self _ensureSchema];
     
     long long rowid = [json[@"__rowid__"] longLongValue];
 
@@ -513,11 +663,49 @@
 }
 
 
--(int)countWhere:(NSString *)where args:(NSArray *)args
+-(void)beginRemove:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
+{
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        BOOL success = [self _remove:json];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(success);
+            });
+        }
+    }];
+}
+
+
+-(void)beginRemove:(NSDictionary *)json completionHandler:(void (^)(BOOL success))completionHandler
+{
+    [self beginRemove:json completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(BOOL)remove:(NSDictionary *)json
+{
+    __block BOOL success;
+    
+    [self.connection dispatchSync:^
+    {
+        success = [self _remove:json];
+    }];
+    
+    return success;
+}
+
+
+-(int)_countWhere:(NSString *)where args:(NSArray *)args
 {
     [self scanSqlForNewColumns:where];
 
-    [self ensureSchema];
+    [self _ensureSchema];
     
     NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT COUNT(*) FROM [%@]", self.name];
     
@@ -537,18 +725,68 @@
 }
 
 
+-(void)beginCountWhere:(NSString *)where args:(NSArray *)args completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
+{
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        __block int count = [self _countWhere:where args:args];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(count);
+            });
+        }
+    }];
+}
+
+
+-(void)beginCountWhere:(NSString *)where args:(NSArray *)args completionHandler:(void (^)(int count))completionHandler
+{
+    [self beginCountWhere:where args:args completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(int)countWhere:(NSString *)where args:(NSArray *)args
+{
+    __block int count;
+    
+    [self.connection dispatchSync:^
+    {
+        count = [self _countWhere:where args:args];
+    }];
+    
+    return count;
+}
+
+
 -(int)count
 {
     return [self countWhere:nil args:nil];
 }
 
 
--(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
+-(void)beginCountWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
+{
+    [self beginCountWhere:nil args:nil completionQueue:completionQueue completionHandler:completionHandler];
+}
+
+
+-(void)beginCountWithCompletionHandler:(void (^)(int count))completionHandler
+{
+    [self beginCountWhere:nil args:nil completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(NSArray *)_findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
 {
     [self scanSqlForNewColumns:where];
     [self scanSqlForNewColumns:orderBy];
 
-    [self ensureSchema];
+    [self _ensureSchema];
     
     // Ok, now we can actually do the query...
     
@@ -610,25 +848,93 @@
 }
 
 
+-(void)beginFindWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *items))completionHandler
+{
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        NSArray *items = [self _findWhere:where args:args orderBy:orderBy limit:limit];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(items);
+            });
+        }
+    }];
+}
+
+
+-(void)beginFindWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit completionHandler:(void (^)(NSArray *items))completionHandler
+{
+    [self beginFindWhere:where args:args orderBy:orderBy limit:limit completionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
+{
+    __block NSArray *items;
+    
+    [self.connection dispatchSync:^
+    {
+        items = [self _findWhere:where args:args orderBy:orderBy limit:limit];
+    }];
+    
+    return items;
+}
+
+
+-(void)beginFindWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *items))completionHandler
+{
+    [self beginFindWhere:where args:args orderBy:orderBy limit:0 completionQueue:completionQueue completionHandler:completionHandler];
+}
+
+
+-(void)beginFindWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy completionHandler:(void (^)(NSArray *items))completionHandler
+{
+    [self beginFindWhere:where args:args orderBy:orderBy limit:0 completionQueue:nil completionHandler:completionHandler];
+}
+
+
 -(NSArray *)findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy
 {
     return [self findWhere:where args:args orderBy:orderBy limit:0];
 }
 
 
--(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args
+-(void)beginFindOneWhere:(NSString *)where args:(NSArray *)args completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSDictionary *item))completionHandler
 {
-    NSArray *items = [self findWhere:where args:args orderBy:nil limit:1];
-    
-    return (items.count == 1) ? items[0] : nil;
+    [self beginFindWhere:where args:args orderBy:nil limit:1 completionQueue:completionQueue completionHandler:^(NSArray *items)
+    {
+        if ( completionHandler )
+            completionHandler([items lastObject]);
+    }];
 }
 
 
--(int)removeWhere:(NSString *)where args:(NSArray *)args
+-(void)beginFindOneWhere:(NSString *)where args:(NSArray *)args completionHandler:(void (^)(NSDictionary *item))completionHandler
+{
+    [self beginFindWhere:where args:args orderBy:nil limit:1 completionQueue:nil completionHandler:^(NSArray *items)
+     {
+         if ( completionHandler )
+             completionHandler([items lastObject]);
+     }];
+}
+
+
+-(NSDictionary *)findOneWhere:(NSString *)where args:(NSArray *)args
+{
+    return [[self findWhere:where args:args orderBy:nil limit:1] lastObject];
+}
+
+
+-(int)_removeWhere:(NSString *)where args:(NSArray *)args
 {
     [self scanSqlForNewColumns:where];
     
-    [self ensureSchema];
+    [self _ensureSchema];
     
     NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE FROM [%@] ", self.name];
     
@@ -646,6 +952,55 @@
     return count;
 }
 
+-(void)beginRemoveWhere:(NSString *)where args:(NSArray *)args completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
+{
+    completionQueue = getCompletionQueue(completionQueue);
+    
+    [self.connection dispatchAsync:^
+    {
+        int count = [self _removeWhere:where args:args];
+        
+        if ( completionHandler )
+        {
+            dispatch_async(completionQueue, ^
+            {
+                completionHandler(count);
+            });
+        }
+    }];
+}
+
+
+-(void)beginRemoveWhere:(NSString *)where args:(NSArray *)args completionHandler:(void (^)(int count))completionHandler
+{
+    [self beginRemoveWhere:where args:args completionQueue:nil completionHandler:completionHandler];
+    
+}
+
+
+-(int)removeWhere:(NSString *)where args:(NSArray *)args
+{
+    __block int count;
+    
+    [self.connection dispatchSync:^
+    {
+        count = [self _removeWhere:where args:args];
+    }];
+    
+    return count;
+}
+
+
+-(void)beginRemoveAllWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
+{
+    [self beginRemoveWhere:nil args:nil completionQueue:completionQueue completionHandler:completionHandler];
+}
+
+
+-(void)beginRemoveAllWithCompletionHandler:(void (^)(int count))completionHandler
+{
+    [self beginRemoveWhere:nil args:nil completionQueue:nil completionHandler:completionHandler];
+}
 
 -(int)removeAll
 {

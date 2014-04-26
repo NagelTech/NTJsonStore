@@ -17,7 +17,7 @@
 @property (nonatomic)               NSString *storePath;
 @property (nonatomic)               NSString *storeName;
 
-@property (nonatomic)               NSString *storeFilename;
+@property (nonatomic,readonly)      NSString *storeFilename;
 @property (readonly,nonatomic)      BOOL exists;
 
 @property (nonatomic,readonly)      NSArray *collections;

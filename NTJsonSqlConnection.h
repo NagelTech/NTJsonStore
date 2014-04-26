@@ -15,10 +15,15 @@
 
 @property (nonatomic,readonly) NSString *filename;
 @property (nonatomic,readonly) sqlite3 *connection;
+@property (nonatomic,readonly) dispatch_queue_t queue;
+@property (nonatomic,readonly) NSString *connectionName;
 
--(id)initWithFilename:(NSString *)filename;
+-(id)initWithFilename:(NSString *)filename connectionName:(NSString *)connectionName;
 
 -(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
+
+-(void)dispatchSync:(void (^)())block;
+-(void)dispatchAsync:(void (^)())block;
 
 @end

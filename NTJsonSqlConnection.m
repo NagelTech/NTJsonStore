@@ -13,8 +13,14 @@
 @interface NTJsonSqlConnection ()
 {
     sqlite3 *_connection;
+    NSString *_connectionName;
     NSString *_filename;
+    NSString *_queueName;
+    
+    dispatch_queue_t _queue;
 }
+
+@property (nonatomic,readonly) NSString *queueName;
 
 @end
 
@@ -22,13 +28,16 @@
 @implementation NTJsonSqlConnection
 
 
--(id)initWithFilename:(NSString *)filename
+-(id)initWithFilename:(NSString *)filename connectionName:(NSString *)connectionName
 {
     self = [super init];
     
     if ( self )
     {
         _filename = filename;
+        _connectionName = connectionName;
+        _queueName = [NSString stringWithFormat:@"com.nageltech.NTJsonStore.%@", connectionName];
+        _queue = dispatch_queue_create(_queueName.UTF8String, DISPATCH_QUEUE_SERIAL);
     }
     
     return self;
@@ -37,28 +46,38 @@
 
 -(sqlite3 *)connection
 {
-    if ( !_connection )
+    @synchronized(self)
     {
-        int status = sqlite3_open_v2([self.filename cStringUsingEncoding:NSUTF8StringEncoding], &_connection, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, NULL);
+        // Make sure the connection is being accessed on the correct queue...
         
-        if ( status != SQLITE_OK )
+        const char *queueName = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
+        
+        if ( strcmp(queueName, _queueName.UTF8String) != 0 )
+            @throw [NSException exceptionWithName:@"WrongQueue" reason:@"Attempt to access SQL connection from the wrong queue." userInfo:nil];
+        
+        if ( !_connection )
         {
-            LOG_ERROR(@"Failed to open database: %d", status);
-            _connection = nil;  // throw execption???
-            return nil;
+            int status = sqlite3_open_v2([self.filename cStringUsingEncoding:NSUTF8StringEncoding], &_connection, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
+            
+            if ( status != SQLITE_OK )
+            {
+                LOG_ERROR(@"Failed to open database: %d", status);
+                _connection = nil;  // throw execption???
+                return nil;
+            }
+            
+            LOG_DBG(@"Database opened, version = %s", sqlite3_version);
+            
+            NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
+            
+            if ( ![journalMode isEqualToString:@"wal"] )
+            {
+                LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
+            }
         }
         
-        LOG_DBG(@"Database opened, version = %s", sqlite3_version);
-        
-        NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
-        
-        if ( ![journalMode isEqualToString:@"wal"] )
-        {
-            LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
-        }
+        return _connection;
     }
-    
-    return _connection;
 }
 
 
@@ -265,6 +284,27 @@
     return value;
 }
 
+
+-(void)dispatchAsync:(void (^)())block
+{
+    dispatch_async(self.queue, block);
+}
+
+
+-(void)dispatchSync:(void (^)())block
+{
+    const char *queueName = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
+    
+    if ( strcmp(queueName, _queueName.UTF8String) == 0 )
+    {
+        block();
+    }
+    
+    else
+    {
+        dispatch_sync(self.queue, block);
+    }
+}
 
 
 

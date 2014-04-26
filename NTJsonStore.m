@@ -49,7 +49,7 @@
 {
     if ( !_connection )
     {
-        _connection = [[NTJsonSqlConnection alloc] initWithFilename:self.storeFilename];
+        _connection = [[NTJsonSqlConnection alloc] initWithFilename:self.storeFilename connectionName:@"[system]"];
     }
     
     return _connection;
@@ -64,27 +64,33 @@
 
 -(NSMutableDictionary *)internalCollections
 {
-    if ( !_internalCollections )
+    @synchronized(self)
     {
-        _internalCollections = [NSMutableDictionary dictionary];
-
-        sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1;" args:nil];
-        
-        int status;
-        
-        while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+        if ( !_internalCollections )
         {
-            NSString *collectionName = [[NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)] lowercaseString];
+            _internalCollections = [NSMutableDictionary dictionary];
             
-            NTJsonCollection *collection = [[NTJsonCollection alloc] initWithStore:self name:collectionName];
-            
-            _internalCollections[collectionName] = collection;
+            [self.connection dispatchSync:^
+            {
+                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1;" args:nil];
+                
+                int status;
+                
+                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                {
+                    NSString *collectionName = [[NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)] lowercaseString];
+                    
+                    NTJsonCollection *collection = [[NTJsonCollection alloc] initWithStore:self name:collectionName];
+                    
+                    _internalCollections[collectionName] = collection;
+                }
+                
+                sqlite3_finalize(statement);
+            }];
         }
         
-        sqlite3_finalize(statement);
+        return _internalCollections;
     }
-    
-    return _internalCollections;
 }
 
 
@@ -96,22 +102,25 @@
 
 -(NTJsonCollection *)collectionWithName:(NSString *)collectionName
 {
-    collectionName = [collectionName lowercaseString];
-    
-    NTJsonCollection *collection = self.internalCollections[collectionName];
-    
-    if ( collection )
+    @synchronized(self)
+    {
+        collectionName = [collectionName lowercaseString];
+        
+        NTJsonCollection *collection = self.internalCollections[collectionName];
+        
+        if ( collection )
+            return collection;
+        
+        // If collection was not found, create it...
+        
+        LOG(@"Creating collection: %@", collectionName);
+        
+        collection = [[NTJsonCollection alloc] initNewCollectionWithStore:self name:collectionName];
+        
+        self.internalCollections[collectionName] = collection;
+        
         return collection;
-    
-    // If collection was not found, create it...
-    
-    LOG(@"Creating collection: %@", collectionName);
-    
-    collection = [[NTJsonCollection alloc] initNewCollectionWithStore:self name:collectionName];
-    
-    self.internalCollections[collectionName] = collection;
-    
-    return collection;
+    }
 }
 
 
