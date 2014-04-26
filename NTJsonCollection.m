@@ -23,6 +23,8 @@
     NSMutableArray *_pendingIndexes;
 }
 
+@property (nonatomic,readonly) NTJsonSqlConnection *connection;
+
 @end
 
 
@@ -76,6 +78,12 @@
 }
 
 
+-(NTJsonSqlConnection *)connection
+{
+    return self.store.connection;   // for now.
+}
+
+
 #pragma mark - Schema Management
 
 
@@ -92,7 +100,7 @@
     _columns = [NSArray array];
     _indexes = [NSArray array];
     
-    return [self.store execSql:sql args:nil];
+    return [self.connection execSql:sql args:nil];
 }
 
 
@@ -110,13 +118,13 @@
 
         NSString *alterSql = [NSString stringWithFormat:@"ALTER TABLE [%@] ADD COLUMN [%@];", self.name, column.name];
         
-        if ( ![self.store execSql:alterSql args:nil] )
+        if ( ![self.connection execSql:alterSql args:nil] )
             return NO;  // oops
     }
     
     // Now we need to populate the data...
     
-    sqlite3_stmt *selectStatement = [self.store statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
+    sqlite3_stmt *selectStatement = [self.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
     
     if ( !selectStatement )
         return NO;  // todo: cleanup here somehow? transaction?
@@ -149,7 +157,7 @@
         
         // Perform our update...
         
-        BOOL success = [self.store execSql:updateSql args:values];
+        BOOL success = [self.connection execSql:updateSql args:values];
         
         if ( !success )
         {
@@ -177,7 +185,7 @@
     for(NTJsonIndex *index in _pendingIndexes)
     {
         LOG_DBG(@"Adding index: %@.%@ (%@)", self.name, index.name, index.keys);
-        if ( ![self.store execSql:[index sqlWithTableName:self.name] args:nil])
+        if ( ![self.connection execSql:[index sqlWithTableName:self.name] args:nil])
             return NO;
     }
     
@@ -214,7 +222,7 @@
     if ( !_columns )
     {
         NSMutableArray *columns = [NSMutableArray array];
-        sqlite3_stmt *statement = [self.store statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
+        sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
         
         int status;
         
@@ -318,7 +326,7 @@
     {
         NSMutableArray *indexes = [NSMutableArray array];
         
-        sqlite3_stmt *statement = [self.store statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
+        sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
         
         int status;
         
@@ -427,10 +435,10 @@
     
     [self extractValuesInColumns:self.columns fromJson:json intoArray:values];
     
-    if ( ![self.store execSql:sql args:values] )
+    if ( ![self.connection execSql:sql args:values] )
         return 0;
     
-    NTJsonRowId rowid = sqlite3_last_insert_rowid(self.store.connection);
+    NTJsonRowId rowid = sqlite3_last_insert_rowid(self.connection.connection);
     
     return rowid;
 }
@@ -481,7 +489,7 @@
     
     [values addObject:@(rowid)];
     
-    BOOL success = [self.store execSql:sql args:values];
+    BOOL success = [self.connection execSql:sql args:values];
     
     if ( success )
         [_objectCache addJson:json withRowId:rowid];
@@ -496,7 +504,7 @@
     
     long long rowid = [json[@"__rowid__"] longLongValue];
 
-    BOOL success = [self.store execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [__rowid__] = ?", self.name] args:@[@(rowid)]];
+    BOOL success = [self.connection execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [__rowid__] = ?", self.name] args:@[@(rowid)]];
     
     if ( success )
         [_objectCache removeObjectWithRowId:rowid];
@@ -516,7 +524,7 @@
     if ( where )
         [sql appendFormat:@" WHERE %@", where];
     
-    sqlite3_stmt *statement = [self.store statementWithSql:sql args:args];
+    sqlite3_stmt *statement = [self.connection statementWithSql:sql args:args];
     
     int count = 0;
     
@@ -555,7 +563,7 @@
     if ( limit > 0 )
         [sql appendFormat:@" LIMIT %d", limit];
     
-    sqlite3_stmt *selectStatement = [self.store statementWithSql:sql args:args];
+    sqlite3_stmt *selectStatement = [self.connection statementWithSql:sql args:args];
     
     // Now we can extract our results!
     
@@ -627,10 +635,10 @@
     if ( where )
         [sql appendFormat:@" WHERE %@", where];
     
-    if ( ![self.store execSql:sql args:args] )
+    if ( ![self.connection execSql:sql args:args] )
         return 0;
     
-    int count = sqlite3_changes(self.store.connection);
+    int count = sqlite3_changes(self.connection.connection);
     
     // note: we may leave objects in the cache that were deleted, but the rowid will not be re-used (thanks to AUTOINCREMENT PK)
     // so it should be eventually cleaned out of the cache from lack of use.

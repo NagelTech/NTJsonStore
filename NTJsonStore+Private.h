@@ -17,6 +17,7 @@
 #import "NTJsonColumn+Private.h"
 #import "NTJsonIndex+Private.h"
 #import "NTJsonObjectCache+Private.h"
+#import "NTJsonSqlConnection.h"
 
 
 #define LOG(format, ...)            NSLog(format, ##__VA_ARGS__)
@@ -26,10 +27,7 @@
 
 @interface NTJsonStore (Private)
 
-@property (readonly,assign)         sqlite3 *connection;
-
--(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
--(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
-
+@property (nonatomic,readonly) NTJsonSqlConnection *connection;
 
 @end
+
