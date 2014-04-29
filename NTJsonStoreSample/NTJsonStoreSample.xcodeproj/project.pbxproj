@@ -75,7 +75,7 @@
 		F051E23018E380B3008E0FFD /* NSDictionary+NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NTJsonStore.h"; sourceTree = "<group>"; };
 		F051E23118E380B3008E0FFD /* NSDictionary+NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NTJsonStore.m"; sourceTree = "<group>"; };
 		F051E23318E3AC8E008E0FFD /* ReceiverData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ReceiverData.json; sourceTree = "<group>"; };
-		F0628498190B2F7B00A93DF7 /* NTJsonSqlConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonSqlConnection.h; sourceTree = "<group>"; };
+		F0628498190B2F7B00A93DF7 /* NTJsonSqlConnection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonSqlConnection+Private.h"; sourceTree = "<group>"; };
 		F0628499190B2F7B00A93DF7 /* NTJsonSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonSqlConnection.m; sourceTree = "<group>"; };
 		F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonIndex.m; sourceTree = "<group>"; };
 		F0C84A4718E4B49400496DE6 /* NTJsonIndex+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonIndex+Private.h"; sourceTree = "<group>"; };
@@ -202,7 +202,7 @@
 				F0C84A4518E4B47B00496DE6 /* NTJsonIndex.m */,
 				F0C84A5F18E9DD3E00496DE6 /* NTJsonObjectCache+Private.h */,
 				F0C84A6018E9DD3E00496DE6 /* NTJsonObjectCache.m */,
-				F0628498190B2F7B00A93DF7 /* NTJsonSqlConnection.h */,
+				F0628498190B2F7B00A93DF7 /* NTJsonSqlConnection+Private.h */,
 				F0628499190B2F7B00A93DF7 /* NTJsonSqlConnection.m */,
 				F051E22118E33EB2008E0FFD /* NTJsonStore+Private.h */,
 				F051E21918E29EB9008E0FFD /* NTJsonStore.h */,
