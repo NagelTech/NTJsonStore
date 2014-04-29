@@ -12,6 +12,9 @@
 #import "NTJsonCollection.h"
 
 
+extern dispatch_queue_t NTJsonStoreSerialQueue;
+
+
 @interface NTJsonStore : NSObject
 
 @property (nonatomic)               NSString *storePath;
@@ -30,6 +33,14 @@
 -(BOOL)ensureSchema;
 
 +(BOOL)isJsonCurrent:(NSDictionary *)json;
+
+-(void)beginSyncCollections:(NSArray *)collections withCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)())completionHandler;
+-(void)beginSyncWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)())completionHandler;
+-(void)beginSyncWithCompletionHandler:(void (^)())completionHandler;
+-(void)syncCollections:(NSArray *)collections wait:(dispatch_time_t)timeout;
+-(void)syncWait:(dispatch_time_t)timeout;
+-(void)sync;
+
 
 @end
 

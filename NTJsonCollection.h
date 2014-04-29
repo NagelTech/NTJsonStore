@@ -14,6 +14,9 @@
 @class NTJsonStore;
 
 
+extern dispatch_queue_t NTJsonCollectionSerialQueue;
+
+
 @interface NTJsonCollection : NSObject
 
 @property (nonatomic,readonly) NSString *name;
@@ -22,6 +25,9 @@
 -(void)addIndexWithKeys:(NSString *)keys;
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 -(void)addQueryableFields:(NSString *)fields;
+
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler;
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(BOOL success))completionHandler;
 -(BOOL)ensureSchema;
 
 -(void)beginInsert:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NTJsonRowId rowid))completionHandler;
@@ -67,6 +73,10 @@
 -(void)beginRemoveAllWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler;
 -(void)beginRemoveAllWithCompletionHandler:(void (^)(int count))completionHandler;
 -(int)removeAll;
+
+-(void)beginSyncWithCompletionHandler:(void (^)())completionHandler;
+-(void)syncWait:(dispatch_time_t)duration;
+-(void)sync;
 
 -(NSString *)description;
 

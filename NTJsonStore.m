@@ -22,6 +22,9 @@
 @end
 
 
+dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
+
+
 @implementation NTJsonStore
 
 
@@ -124,18 +127,6 @@
 }
 
 
--(BOOL)ensureSchema
-{
-    for(NTJsonCollection *collection in self.collections)
-    {
-        if ( ![collection ensureSchema] )
-            return NO;
-    }
-    
-    return YES;
-}
-
-
 +(BOOL)isJsonCurrent:(NSDictionary *)json
 {
     if ( ![json isKindOfClass:[NTJsonObjectProxy class]] )
@@ -144,6 +135,139 @@
     NTJsonObjectProxy *proxy = (id)json;
     
     return proxy.NTJsonObjectProxy_isCurrent;
+}
+
+
+#pragma mark - misc
+
+
+-(dispatch_queue_t)getCompletionQueue:(dispatch_queue_t)completionQueue
+{
+    if ( (id)completionQueue == (id)NTJsonStoreSerialQueue )
+        return self.connection.queue;   // a little magic here
+    
+    if ( completionQueue )
+        return completionQueue;
+    
+    if ( [NSThread isMainThread] )
+        return dispatch_get_main_queue();
+    
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+
+#pragma mark - ensureSchema
+
+
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
+{
+    __block BOOL allSuccess = YES;
+    
+    for(NTJsonCollection *collection in self.collections)
+    {
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(BOOL success)
+         {
+             if ( !success )
+                 allSuccess = NO;
+         }];
+    }
+    
+    [self beginSyncWithCompletionQueue:completionQueue completionHandler:^
+     {
+         completionHandler(allSuccess);
+     }];
+}
+
+
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(BOOL success))completionHandler
+{
+    [self beginEnsureSchemaWithCompletionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(BOOL)ensureSchema
+{
+    __block BOOL allSuccess = YES;
+    
+    for(NTJsonCollection *collection in self.collections)
+    {
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(BOOL success)
+         {
+             if ( !success )
+                 allSuccess = NO;
+         }];
+    }
+    
+    [self sync];
+    
+    return allSuccess;
+}
+
+
+#pragma mark - sync
+
+
+-(void)beginSyncCollections:(NSArray *)collections withCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)())completionHandler
+{
+    completionQueue = [self getCompletionQueue:completionQueue];
+    
+    dispatch_group_t group = dispatch_group_create();
+
+    dispatch_group_async(group, self.connection.queue, ^{
+        // this space intentionally left blank
+    });
+    
+    for (NTJsonCollection *collection in collections)
+    {
+        dispatch_group_async(group, collection.connection.queue, ^{
+            // we don't actually need to do anything here specific...
+        });
+    }
+    
+    dispatch_group_notify(group, completionQueue, completionHandler);
+}
+
+
+-(void)beginSyncWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)())completionHandler
+{
+    [self beginSyncCollections:self.collections withCompletionQueue:completionQueue completionHandler:completionHandler];
+}
+
+
+-(void)beginSyncWithCompletionHandler:(void (^)())completionHandler
+{
+    [self beginSyncCollections:self.collections withCompletionQueue:nil completionHandler:completionHandler];
+}
+
+
+-(void)syncCollections:(NSArray *)collections wait:(dispatch_time_t)timeout
+{
+    dispatch_group_t group = dispatch_group_create();
+    
+    dispatch_group_async(group, self.connection.queue, ^{
+        // this space intentionally left blank
+    });
+    
+    for (NTJsonCollection *collection in collections)
+    {
+        dispatch_group_async(group, collection.connection.queue, ^{
+            // we don't actually need to do anything here specific...
+        });
+    }
+    
+    dispatch_group_wait(group, timeout);
+}
+
+
+-(void)syncWait:(dispatch_time_t)timeout
+{
+    [self syncCollections:self.collections wait:timeout];
+}
+
+
+-(void)sync
+{
+    [self syncCollections:self.collections wait:DISPATCH_TIME_FOREVER];
 }
 
 

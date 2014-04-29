@@ -9,6 +9,9 @@
 #import "NTJsonStore+Private.h"
 
 
+dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue";
+
+
 @interface NTJsonCollection ()
 {
     NTJsonStore *_store;
@@ -77,6 +80,34 @@
 -(NSString *)description
 {
     return self.name;
+}
+
+
+-(dispatch_queue_t)getCompletionQueue:(dispatch_queue_t)completionQueue
+{
+    if ( (id)completionQueue == (id)NTJsonCollectionSerialQueue )
+        return self.connection.queue;   // a little magic here
+    
+    if ( completionQueue )
+        return completionQueue;
+    
+    if ( [NSThread isMainThread] )
+        return dispatch_get_main_queue();
+    
+    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+
+-(void)dispatchCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)())completionHandler
+{
+    if ( !completionQueue )
+        return ;
+    
+    if ( completionQueue == self.connection.queue )
+        completionHandler();
+    
+    else
+        dispatch_async(completionQueue, completionHandler);
 }
 
 
@@ -208,6 +239,28 @@
 }
 
 
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
+{
+    completionQueue = [self getCompletionQueue:completionQueue];
+    
+    [self.connection dispatchAsync:^
+    {
+        BOOL success = [self _ensureSchema];
+        
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
+        {
+            completionHandler(success);
+        }];
+    }];
+}
+
+
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(BOOL success))completionHandler
+{
+    [self beginEnsureSchemaWithCompletionQueue:nil completionHandler:completionHandler];
+}
+
+
 -(BOOL)ensureSchema
 {
     __block BOOL success;
@@ -219,6 +272,7 @@
     
     return success;
 }
+
 
 #pragma mark - Column Support
 
@@ -434,20 +488,7 @@
 }
 
 
-#pragma mark - Data Access Methods
-
-
-static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQueue)
-{
-    if ( completionQueue )
-        return completionQueue;
-    
-    else if ( [NSThread isMainThread] )
-        return dispatch_get_main_queue();
-    
-    else
-        return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-}
+#pragma mark - insert
 
 
 -(NTJsonRowId)_insert:(NSDictionary *)json
@@ -481,19 +522,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginInsert:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NTJsonRowId rowid))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         NTJsonRowId rowid = [self _insert:json];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(rowid);
-            });
-        }
+            completionHandler(rowid);
+        }];
     }];
 }
 
@@ -515,6 +553,9 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
     
     return rowid;
 }
+
+
+#pragma mark - insertBatch
 
 
 -(BOOL)_insertBatch:(NSArray *)items
@@ -541,19 +582,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginInsertBatch:(NSArray *)items completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         BOOL success = [self _insertBatch:items];
        
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(success);
-            });
-        }
+            completionHandler(success);
+        }];
     }];
 }
 
@@ -575,6 +613,9 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
     
     return success;
 }
+
+
+#pragma mark - update
 
 
 -(BOOL)_update:(NSDictionary *)json
@@ -611,19 +652,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginUpdate:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         BOOL success = [self _update:json];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(success);
-            });
-        }
+            completionHandler(success);
+        }];
     }];
 }
 
@@ -647,6 +685,8 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 }
 
 
+#pragma mark - remove
+
 
 -(BOOL)_remove:(NSDictionary *)json
 {
@@ -665,19 +705,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginRemove:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         BOOL success = [self _remove:json];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(success);
-            });
-        }
+            completionHandler(success);
+        }];
     }];
 }
 
@@ -699,6 +736,9 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
     
     return success;
 }
+
+
+#pragma mark - count
 
 
 -(int)_countWhere:(NSString *)where args:(NSArray *)args
@@ -727,19 +767,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginCountWhere:(NSString *)where args:(NSArray *)args completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
-        __block int count = [self _countWhere:where args:args];
+        int count = [self _countWhere:where args:args];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(count);
-            });
-        }
+            completionHandler(count);
+        }];
     }];
 }
 
@@ -779,6 +816,9 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 {
     [self beginCountWhere:nil args:nil completionQueue:nil completionHandler:completionHandler];
 }
+
+
+#pragma mark - find
 
 
 -(NSArray *)_findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
@@ -850,19 +890,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginFindWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *items))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         NSArray *items = [self _findWhere:where args:args orderBy:orderBy limit:limit];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(items);
-            });
-        }
+            completionHandler(items);
+        }];
     }];
 }
 
@@ -930,6 +967,9 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 }
 
 
+#pragma mark - removeWhere
+
+
 -(int)_removeWhere:(NSString *)where args:(NSArray *)args
 {
     [self scanSqlForNewColumns:where];
@@ -954,19 +994,16 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 
 -(void)beginRemoveWhere:(NSString *)where args:(NSArray *)args completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(int count))completionHandler
 {
-    completionQueue = getCompletionQueue(completionQueue);
+    completionQueue = [self getCompletionQueue:completionQueue];
     
     [self.connection dispatchAsync:^
     {
         int count = [self _removeWhere:where args:args];
         
-        if ( completionHandler )
+        [self dispatchCompletionQueue:completionQueue completionHandler:^
         {
-            dispatch_async(completionQueue, ^
-            {
-                completionHandler(count);
-            });
-        }
+            completionHandler(count);
+        }];
     }];
 }
 
@@ -1005,6 +1042,34 @@ static inline dispatch_queue_t getCompletionQueue(dispatch_queue_t completionQue
 -(int)removeAll
 {
     return [self removeWhere:nil args:nil];
+}
+
+
+#pragma mark - sync
+
+
+-(void)beginSyncWithCompletionHandler:(void (^)())completionHandler
+{
+    dispatch_async(self.connection.queue, completionHandler);
+}
+
+
+-(void)syncWait:(dispatch_time_t)timeout
+{
+    dispatch_group_t group = dispatch_group_create();
+    
+    dispatch_group_async(group, self.connection.queue, ^
+    {
+        // we don't actually need to do anything here specific...
+    });
+    
+    dispatch_group_wait(group, timeout);
+}
+
+
+-(void)sync
+{
+    [self syncWait:DISPATCH_TIME_FOREVER];
 }
 
 
