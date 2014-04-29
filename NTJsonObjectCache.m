@@ -24,10 +24,7 @@
 static const int DEFAULT_CACHE_SIZE = 50;
 
 
-@class  NTJsonObjectCacheItem;
-
-
-@interface NTJsonObjectProxy : NSProxy
+@interface NTJsonObjectProxy ()
 {
     NTJsonObjectCacheItem *_cacheItem;
 }
@@ -96,6 +93,21 @@ static const int DEFAULT_CACHE_SIZE = 50;
 -(NSMethodSignature *)methodSignatureForSelector:(SEL)sel
 {
     return [_cacheItem.json methodSignatureForSelector:sel];
+}
+
+
+-(BOOL)isKindOfClass:(Class)aClass
+{
+    if ( aClass == [NTJsonObjectProxy class] )
+        return YES; // so we can detect if we are ourselves ;)
+    
+    return [_cacheItem.json isKindOfClass:aClass];
+}
+
+
+-(BOOL)NTJsonObjectProxy_isCurrent
+{
+    return (_cacheItem.cache) ? YES : NO;
 }
 
 

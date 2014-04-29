@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSDictionary (NTJsonStore)
+@interface NSDictionary (NTJsonStorePrivate)
 
 -(id)NTJsonStore_objectForKeyPath:(NSString *)keyPath;
 

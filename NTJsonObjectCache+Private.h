@@ -11,6 +11,16 @@
 #import "NTJsonStoreTypes.h"
 
 
+@class  NTJsonObjectCacheItem;
+
+
+@interface NTJsonObjectProxy : NSProxy
+
+-(BOOL)NTJsonObjectProxy_isCurrent;
+
+@end
+
+
 @interface NTJsonObjectCache : NSObject
 
 @property (nonatomic) int cacheSize;

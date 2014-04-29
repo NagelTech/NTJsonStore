@@ -8,8 +8,8 @@
 
 #import <sqlite3.h>
 
-#import "NSArray+NTJsonStore.h"
-#import "NSDictionary+NTJsonStore.h"
+#import "NSArray+NTJsonStorePrivate.h"
+#import "NSDictionary+NTJsonStorePrivate.h"
 
 #import "NTJsonStore.h"
 

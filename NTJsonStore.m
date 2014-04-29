@@ -136,4 +136,15 @@
 }
 
 
++(BOOL)isJsonCurrent:(NSDictionary *)json
+{
+    if ( ![json isKindOfClass:[NTJsonObjectProxy class]] )
+        return NO;
+    
+    NTJsonObjectProxy *proxy = (id)json;
+    
+    return proxy.NTJsonObjectProxy_isCurrent;
+}
+
+
 @end

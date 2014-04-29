@@ -6,10 +6,10 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NSArray+NTJsonStore.h"
+#import "NSArray+NTJsonStorePrivate.h"
 
 
-@implementation NSArray (NTJsonStore)
+@implementation NSArray (NTJsonStorePrivate)
 
 
 -(NSArray *)NTJsonStore_transform:(id (^)(id item))block

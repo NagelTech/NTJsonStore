@@ -86,11 +86,6 @@ static id mutableDeepCopy(id value)
 -(void)doTest
 {
     NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"sample.db"];
-
-    if ( !store.collections.count )
-        [self loadDataWithStore:store];
-    
-    NSLog(@"Collections: %@", [store.collections componentsJoinedByString:@", "]);
     
     // Ok, now we can use our data...
     
@@ -108,19 +103,39 @@ static id mutableDeepCopy(id value)
     [categoriesCollection addUniqueIndexWithKeys:@"[id]"];
     [categoriesCollection addIndexWithKeys:@"[name]"];
     
+    // Clear all...
+    
+    if ( YES )
+    {
+        [messagesCollection removeAll];
+        [sourcesCollection removeAll];
+        [categoriesCollection removeAll];
+    }
+    
+    // Build it if needed
+    
+    if ( !messagesCollection.count )
+        [self loadDataWithStore:store];
+    
+    NSLog(@"Collections: %@", [store.collections componentsJoinedByString:@", "]);
+
     NSLog(@"Initial Data");
     
     [self dumpMessagesInStore:store];
     
     // Convert Category ID's to numeric...
     
-    for(NSMutableDictionary *category in mutableDeepCopy([categoriesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"]))
+    for(NSDictionary *category in [categoriesCollection findWhere:@"[id] <> [__rowid__]" args:nil orderBy:@"[id] desc"])
     {
+        NSMutableDictionary *mutableCategory = [category mutableCopy];
+        
         NSArray *messages = mutableDeepCopy([messagesCollection findWhere:@"[categoryId]=?" args:@[category[@"id"]] orderBy:nil]);
         
-        category[@"id"] = category[@"__rowid__"];
+        mutableCategory[@"id"] = mutableCategory[@"__rowid__"];
         
-        [categoriesCollection update:category];
+//        NSLog(@"Category is current: %d", NTJsonStore_isJsonCurrent(category));
+        [categoriesCollection update:mutableCategory];
+//        NSLog(@"Category is current: %d", NTJsonStore_isJsonCurrent(category));
         
         for(NSMutableDictionary *message in messages)
         {

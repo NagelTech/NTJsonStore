@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSArray (NTJsonStore)
+@interface NSArray (NTJsonStorePrivate)
 
 -(NSArray *)NTJsonStore_transform:(id (^)(id item))block;
 -(id)NTJsonStore_find:(BOOL (^)(id item))block;

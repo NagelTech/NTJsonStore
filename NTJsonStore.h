@@ -29,6 +29,7 @@
 
 -(BOOL)ensureSchema;
 
-@end
++(BOOL)isJsonCurrent:(NSDictionary *)json;
 
+@end
 

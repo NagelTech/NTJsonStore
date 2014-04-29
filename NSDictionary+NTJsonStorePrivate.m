@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NSDictionary+NTJsonStore.h"
+#import "NSDictionary+NTJsonStorePrivate.h"
 
 
 @implementation NSDictionary (NTJsonStore)
