@@ -96,6 +96,9 @@ static id mutableDeepCopy(id value)
     [messagesCollection addUniqueIndexWithKeys:@"[id]"];
     [messagesCollection addIndexWithKeys:@"[categoryId]"];
     [messagesCollection addIndexWithKeys:@"[sourceId]"];
+    [messagesCollection addIndexWithKeys:@"[optionalBool]"];
+    
+    messagesCollection.defaultJson = @{@"optionalBool": @(NO)};
     
     [sourcesCollection addUniqueIndexWithKeys:@"[id]"];
     [sourcesCollection addIndexWithKeys:@"[name]"];
@@ -122,6 +125,13 @@ static id mutableDeepCopy(id value)
     NSLog(@"Initial Data");
     
     [self dumpMessagesInStore:store];
+    
+    NSLog(@"Messages with optionalBool = false:");
+    
+    for(NSDictionary *message in [messagesCollection findWhere:@"optionalBool = ?" args:@[@(NO)] orderBy:@"id"])
+    {
+        NSLog(@"    %@ - %@", message[@"id"], message[@"title"]);
+    }
     
     // Convert Category ID's to numeric...
     

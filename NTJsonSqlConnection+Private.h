@@ -22,6 +22,7 @@
 
 -(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
+-(id)execValueSql:(NSString *)sql args:(NSArray *)args;
 
 -(void)dispatchSync:(void (^)())block;
 -(void)dispatchAsync:(void (^)())block;

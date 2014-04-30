@@ -22,6 +22,7 @@
 @end
 
 
+NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 
@@ -75,7 +76,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
             
             [self.connection dispatchSync:^
             {
-                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY 1;" args:nil];
+                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'  AND name <> ? ORDER BY 1;" args:@[NTJsonStore_MetadataTableName]];
                 
                 int status;
                 

@@ -6,7 +6,8 @@
       "title" : "UPS MyChoice Delivery Confirmation",
       "body" : "Your Shipment(s) below have been delivered.",
       "sourceId" : "ups",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "2",
@@ -14,7 +15,7 @@
       "title" : "Important Information Regarding your Verizon wireless account",
       "body" : "Your Verizon Wireless online account - Account number ending in 8479-0001",
       "sourceId" : "verizon",
-      "cardType" : "default"
+      "cardType" : "default",
     },
     {
       "id" : "3",
@@ -22,7 +23,8 @@
       "title" : "Your reservation confirmation for 1760",
       "body" : "Dear Jacob,\nYou're dining at 1760!\nManage this reservation on the go with our mobile apps:",
       "sourceId" : "opentable",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "4",
@@ -38,7 +40,8 @@
       "title" : "AT&T Use Update: You Have Used 3335 MB of Data",
       "body" : "Update on data use\nDear JACOB KNOBEL,\nCourtesy Message - Keeping track of the data used on your mobile (505134512)...",
       "sourceId" : "att",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "6",
@@ -54,7 +57,8 @@
       "title" : "Virgin America Reservation NERZMM",
       "body" : "It’s almost time to fly. Speed up your check-in by doing it online. After you check in, print your boarding pass and pay for any bags you’re checking. Remember, if you are checking bags, they must be dropped at the ticket counter at least 45 minutes prior to departure. We look forward to welcoming you onboard.",
       "sourceId" : "virginamerica",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "8",
@@ -70,7 +74,8 @@
       "title" : "Your Amazon.com order of \"Black & Decker CHV1410L...\" has shipped!",
       "body" : "Greetings Ethan Nagel!\nWe thought you'd like to know that CPO Outlets shipped your items, and that this completes your order. Your order is being shipped and cannot be changed by you or by our customer service department.",
       "sourceId" : "amazon",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "10",
@@ -86,7 +91,8 @@
       "title" : "You Have Authorized a Payment to BRAGI LLC, Kickstarter, Inc.",
       "body" : "We have received your Feb 12, 2014 authorization to let BRAGI LLC, Kickstarter, Inc. charge you. Details of this transaction are below:\nRecipient: BRAGI LLC, Kickstarter, Inc.\nMaximum Authorized Amount*: $199.00\nFor: Pledging on Kickstarter.",
       "sourceId" : "amazon",
-      "cardType" : "default"
+      "cardType" : "default",
+      "optionalBool": true,
     },
     {
       "id" : "12",
@@ -94,7 +100,7 @@
       "title" : "Your Amazon.com order has shipped (#109-6260369-2621868)",
       "body" : "We thought you'd like to know that we shipped this portion of your order separately to give you quicker service.\n   Philips Sonicare HX7023/30 Eseries Standard Replacement Brush Heads, 3 Pack, Frustration Free Packaging\n   Brita Atlantis Water Filter Pitcher, Blue, 6 Cup",
       "sourceId" : "amazon",
-      "cardType" : "default"
+      "cardType" : "default",
     }
   ],
   "sources" : [

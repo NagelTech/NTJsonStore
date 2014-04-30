@@ -21,6 +21,7 @@ extern dispatch_queue_t NTJsonCollectionSerialQueue;
 
 @property (nonatomic,readonly) NSString *name;
 @property (nonatomic,readonly) NTJsonStore *store;
+@property (nonatomic) NSDictionary *defaultJson;
 
 -(void)addIndexWithKeys:(NSString *)keys;
 -(void)addUniqueIndexWithKeys:(NSString *)keys;

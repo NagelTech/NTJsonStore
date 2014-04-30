@@ -25,6 +25,9 @@
 #define LOG_DBG(format, ...)      NSLog(@"Debug: " format, ##__VA_ARGS__)
 
 
+extern NSString *NTJsonStore_MetadataTableName;
+
+
 @interface NTJsonStore (Private)
 
 @property (nonatomic,readonly) NTJsonSqlConnection *connection;
