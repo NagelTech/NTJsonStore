@@ -151,6 +151,8 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 {
     __block BOOL success;
     
+    // NOTE: This is using the Store's queue, so it is serialized across all collections...
+    
     [self.store.connection dispatchSync:^{
         NSNumber *count = [self.store.connection execValueSql:@"SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?;" args:@[NTJsonStore_MetadataTableName]];
         
@@ -231,14 +233,18 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSDictionary *)defaultJson
 {
+    __block NSDictionary *defaultJson;
+    
     [self.connection dispatchSync:^{
         if ( !_defaultJson )
         {
             _defaultJson = self.metadata[@"defaultJson"] ?: [NSDictionary dictionary];
         }
+        
+        defaultJson = _defaultJson;
     }];
     
-    return _defaultJson;
+    return defaultJson;
 }
 
 
@@ -281,7 +287,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(void)setDefaultJson:(NSDictionary *)defaultJson
 {
-    [self.connection dispatchSync:^{
+    [self.connection dispatchAsync:^{
         if ( [self.defaultJson isEqualToDictionary:defaultJson] )
             return ; // no changes, skip all this craziness
         
@@ -300,13 +306,10 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         
         _defaultJson = [defaultJson copy];
         self.metadata[@"defaultJson"] = _defaultJson;
+
+        // save our metadata...
         
-        // We need to save the new metadata, but that can happen asynchronously...
-        
-        [self.connection dispatchAsync:^
-        {
-            [self _saveMetadata];
-        }];
+        [self _saveMetadata];
     }];
 
 }
@@ -491,33 +494,35 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSArray *)columns
 {
-    // if we don't have our list of columns, let's extract them...
+    __block NSArray *columns;
 
     [self.connection dispatchSync:^{
+        
+        // if we don't have our list of columns, let's extract them...
         if ( !_columns )
         {
-            [self.connection dispatchSync:^{
-                NSMutableArray *columns = [NSMutableArray array];
-                sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
+            NSMutableArray *columns = [NSMutableArray array];
+            sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
+            
+            int status;
+            
+            while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+            {
+                NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
                 
-                int status;
+                if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
+                    continue;
                 
-                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
-                {
-                    NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
-                    
-                    if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
-                        continue;
-                    
-                    [columns addObject:[NTJsonColumn columnWithName:columnName]];
-                }
-                
-                _columns = [columns copy];
-            }];
+                [columns addObject:[NTJsonColumn columnWithName:columnName]];
+            }
+            
+            _columns = [columns copy];
         }
+        
+        columns = _columns;
     }];
     
-    return _columns;
+    return columns;
 }
 
 
@@ -604,41 +609,43 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSArray *)indexes
 {
+    __block NSArray *indexes;
+    
     [self.connection dispatchSync:^{
         if ( !_indexes )
         {
-            [self.connection dispatchSync:^{
-                NSMutableArray *indexes = [NSMutableArray array];
+            NSMutableArray *indexes = [NSMutableArray array];
+            
+            sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
+            
+            int status;
+            
+            while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+            {
+                NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
                 
-                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
+                if ( !sql.length )
+                    continue ;
                 
-                int status;
+                NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
                 
-                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                if ( !index )
                 {
-                    NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
-                    
-                    if ( !sql.length )
-                        continue ;
-                    
-                    NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
-                    
-                    if ( !index )
-                    {
-                        LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
-                        continue;
-                    }
-                    
-                    [indexes addObject:index];
-                    
+                    LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
+                    continue;
                 }
                 
-                _indexes = [indexes copy];
-            }];
+                [indexes addObject:index];
+                
+            }
+            
+            _indexes = [indexes copy];
         }
+        
+        indexes = _indexes;
     }];
     
-    return _indexes;
+    return indexes;
 }
 
 
@@ -1222,6 +1229,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     [self beginRemoveWhere:nil args:nil completionQueue:nil completionHandler:completionHandler];
 }
 
+
 -(int)removeAll
 {
     return [self removeWhere:nil args:nil];
@@ -1237,7 +1245,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 }
 
 
--(void)syncWait:(dispatch_time_t)timeout
+-(BOOL)syncWait:(dispatch_time_t)timeout
 {
     dispatch_group_t group = dispatch_group_create();
     
@@ -1246,7 +1254,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         // we don't actually need to do anything here specific...
     });
     
-    dispatch_group_wait(group, timeout);
+    return (dispatch_group_wait(group, timeout) == 0) ? YES : NO;
 }
 
 

@@ -76,7 +76,7 @@ extern dispatch_queue_t NTJsonCollectionSerialQueue;
 -(int)removeAll;
 
 -(void)beginSyncWithCompletionHandler:(void (^)())completionHandler;
--(void)syncWait:(dispatch_time_t)duration;
+-(BOOL)syncWait:(dispatch_time_t)duration;
 -(void)sync;
 
 -(NSString *)description;
