@@ -176,17 +176,17 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSMutableDictionary *)metadata
 {
-    if ( !_metadata )
-    {
-        [self.connection dispatchSync:^{
+    [self.connection dispatchSync:^{
+        if ( !_metadata )
+        {
             NSString *value = [self.connection execValueSql:[NSString stringWithFormat:@"SELECT [metadata] FROM [%@] WHERE [collection] = ?", NTJsonStore_MetadataTableName] args:@[self.name]];
             
             NSDictionary *json = (value) ? [NSJSONSerialization JSONObjectWithData:[value dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil] : nil;
             
             _metadata = (json) ? [json mutableCopy] : [NSMutableDictionary dictionary];
-        }];
-    }
-    
+        }
+    }];
+
     return _metadata;
 }
 
@@ -231,10 +231,12 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSDictionary *)defaultJson
 {
-    if ( !_defaultJson )
-    {
-        _defaultJson = self.metadata[@"defaultJson"] ?: [NSDictionary dictionary];
-    }
+    [self.connection dispatchSync:^{
+        if ( !_defaultJson )
+        {
+            _defaultJson = self.metadata[@"defaultJson"] ?: [NSDictionary dictionary];
+        }
+    }];
     
     return _defaultJson;
 }
@@ -279,31 +281,34 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(void)setDefaultJson:(NSDictionary *)defaultJson
 {
-    if ( [self.defaultJson isEqualToDictionary:defaultJson] )
-        return ; // no changes, skip all this craziness
-    
-    // If defaults have chaged for any existing columns, we need to add them to our pending columns list
-    // so they can be re-generated...
-    
-    NSArray *changedColumns = [self detectChangedColumnsInDefaultJson:defaultJson];
-    
-    for(NTJsonColumn *column in changedColumns)
-    {
-        if ( ![_pendingColumns NTJsonStore_find:^BOOL(NTJsonColumn *item) { return [item.name isEqualToString:column.name]; }] )
-            [_pendingColumns addObject:column];
-    }
-    
-    // Update our internal variables...
-    
-    _defaultJson = [defaultJson copy];
-    self.metadata[@"defaultJson"] = _defaultJson;
-    
-    // We need to save the new metadata, but that can happen asynchronously...
-    
-    [self.connection dispatchAsync:^
-    {
-        [self _saveMetadata];
+    [self.connection dispatchSync:^{
+        if ( [self.defaultJson isEqualToDictionary:defaultJson] )
+            return ; // no changes, skip all this craziness
+        
+        // If defaults have chaged for any existing columns, we need to add them to our pending columns list
+        // so they can be re-generated...
+        
+        NSArray *changedColumns = [self detectChangedColumnsInDefaultJson:defaultJson];
+        
+        for(NTJsonColumn *column in changedColumns)
+        {
+            if ( ![_pendingColumns NTJsonStore_find:^BOOL(NTJsonColumn *item) { return [item.name isEqualToString:column.name]; }] )
+                [_pendingColumns addObject:column];
+        }
+        
+        // Update our internal variables...
+        
+        _defaultJson = [defaultJson copy];
+        self.metadata[@"defaultJson"] = _defaultJson;
+        
+        // We need to save the new metadata, but that can happen asynchronously...
+        
+        [self.connection dispatchAsync:^
+        {
+            [self _saveMetadata];
+        }];
     }];
+
 }
 
 
@@ -372,6 +377,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     while ( (status=sqlite3_step(selectStatement)) == SQLITE_ROW )
     {
         int rowid = sqlite3_column_int(selectStatement, 0);
+        
+        // todo: take advantage of any cached JSON... cache it to???
+        
         NSData *jsonData = [NSData dataWithBytes:sqlite3_column_blob(selectStatement, 1) length:sqlite3_column_bytes(selectStatement, 1)];
         
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];
@@ -485,8 +493,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 {
     // if we don't have our list of columns, let's extract them...
 
-    @synchronized(self)
-    {
+    [self.connection dispatchSync:^{
         if ( !_columns )
         {
             [self.connection dispatchSync:^{
@@ -508,9 +515,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
                 _columns = [columns copy];
             }];
         }
-        
-        return _columns;
-    }
+    }];
+    
+    return _columns;
 }
 
 
@@ -586,7 +593,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(void)addQueryableFields:(NSString *)fields
 {
-    [self scanSqlForNewColumns:fields];
+    [self.connection dispatchAsync:^{
+        [self scanSqlForNewColumns:fields];
+    }];
 }
 
 
@@ -595,8 +604,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NSArray *)indexes
 {
-    @synchronized(self)
-    {
+    [self.connection dispatchSync:^{
         if ( !_indexes )
         {
             [self.connection dispatchSync:^{
@@ -628,9 +636,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
                 _indexes = [indexes copy];
             }];
         }
-        
-        return _indexes;
-    }
+    }];
+    
+    return _indexes;
 }
 
 
@@ -659,8 +667,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(void)addIndexWithKeys:(NSString *)keys isUnique:(BOOL)isUnique
 {
-    @synchronized(self)
-    {
+    [self.connection dispatchAsync:^{
         // First off, let's see if it already exists...
         
         if ( [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
@@ -676,7 +683,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         NTJsonIndex *index = [NTJsonIndex indexWithName:name keys:keys isUnique:isUnique];
         
         [_pendingIndexes addObject:index];
-    }
+    }];
 }
 
 
