@@ -12,10 +12,11 @@
 
 @interface NTJsonSqlConnection ()
 {
-    sqlite3 *_connection;
+    sqlite3 *_db;
     NSString *_connectionName;
     NSString *_filename;
     NSString *_queueName;
+    NSError *_lastError;
     
     dispatch_queue_t _queue;
 }
@@ -44,40 +45,46 @@
 }
 
 
--(sqlite3 *)connection
+-(sqlite3 *)db
 {
-    @synchronized(self)
+    // Make sure the connection is being accessed on the correct queue...
+    // if this happens it means our code i broken...
+    
+#ifdef DEBUG
+    
+    const char *queueName = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
+    
+    NSAssert(strcmp(queueName, _queueName.UTF8String) == 0, @"Attempt to access SQL connection from the wrong queue.");
+    
+#endif
+    
+    if ( !_db )
     {
-        // Make sure the connection is being accessed on the correct queue...
+        int status = sqlite3_open_v2([self.filename cStringUsingEncoding:NSUTF8StringEncoding], &_db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
         
-        const char *queueName = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
-        
-        if ( strcmp(queueName, _queueName.UTF8String) != 0 )
-            @throw [NSException exceptionWithName:@"WrongQueue" reason:@"Attempt to access SQL connection from the wrong queue." userInfo:nil];
-        
-        if ( !_connection )
+        if ( status != SQLITE_OK )
         {
-            int status = sqlite3_open_v2([self.filename cStringUsingEncoding:NSUTF8StringEncoding], &_connection, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
+            _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
             
-            if ( status != SQLITE_OK )
-            {
-                LOG_ERROR(@"Failed to open database: %d", status);
-                _connection = nil;  // throw execption???
-                return nil;
-            }
+            LOG_ERROR(@"Failed to open database: %@", _lastError.localizedDescription);
             
-            LOG_DBG(@"Database opened, version = %s", sqlite3_version);
-            
-            NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
-            
-            if ( ![journalMode isEqualToString:@"wal"] )
-            {
-                LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
-            }
+            _db = nil;
+
+            return nil;
         }
         
-        return _connection;
+        LOG_DBG(@"Database opened for connection %@", _connectionName);
+        
+        NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
+        
+        if ( ![journalMode isEqualToString:@"wal"] )
+        {
+            LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
+            // do not fail in this case.
+        }
     }
+    
+    return _db;
 }
 
 
@@ -111,9 +118,6 @@
             else if ( [arg isKindOfClass:[NSNumber class]] )
                 value = [arg stringValue];
             
-            else if ( [arg isKindOfClass:[NSDate class]])
-                value = [(NSDate *)arg stringWithFormat:@"[yyyy/MM/dd HH:mm:ss zzz]"];
-            
             else if ( [arg isKindOfClass:[NSData class]] )
                 value = [NSString stringWithFormat:@"[BLOB %d]", ((NSData *)arg).length];
             
@@ -141,11 +145,14 @@
     if ( ![sql hasSuffix:@";"] )
         sql = [sql stringByAppendingString:@";"];
     
-    NSUInteger status = sqlite3_prepare_v2(self.connection, [sql cStringUsingEncoding:NSUTF8StringEncoding], (int)sql.length, &statement, NULL);
+    if ( !self.db )
+        return NULL;    // avoid even calling prepare
+    
+    NSUInteger status = sqlite3_prepare_v2(self.db, [sql cStringUsingEncoding:NSUTF8StringEncoding], (int)sql.length, &statement, NULL);
     
     if (status != SQLITE_OK )
     {
-        LOG_ERROR(@" Failed to prepare statement %@ - %s", sql, sqlite3_errmsg(self.connection));
+        LOG_ERROR(@"Failed to prepare statement %@ - %@", sql, _lastError.localizedDescription);
         return NULL;
     }
     
@@ -177,14 +184,14 @@
                 
                 else
                 {
-                    LOG_ERROR(@"Unknown Numeric type %s", numType);
+                    _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorInvalidSqlArgument format:@"Invalid Sql Argument - unsupported numeric type %s", numType];
+                    
+                    LOG_ERROR(@"%@", _lastError);
+                    
+                    sqlite3_finalize(statement);
+                    
                     return NULL;
                 }
-            }
-            
-            else if ( [arg isKindOfClass:[NSDate class]] )
-            {
-                sqlite3_bind_int(statement, index, [arg timeIntervalSince1970]);
             }
             
             else if ( [arg isKindOfClass:[NSData class]] )
@@ -199,7 +206,12 @@
             
             else
             {
-                LOG_ERROR(@"Unknown type: %@", NSStringFromClass([arg class]));
+                _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorInvalidSqlArgument format:@"Invalid Sql Argument - unsupported type: %@", NSStringFromClass([arg class])];
+                
+                LOG_ERROR(@"%@", _lastError.localizedDescription);
+                
+                sqlite3_finalize(statement);
+                
                 return NULL;
             }
             
@@ -220,15 +232,18 @@
     
     int status = sqlite3_step(statement);
     
-    if ( status != SQLITE_DONE )
+    if ( status != SQLITE_DONE && status != SQLITE_ROW )
     {
-        LOG_ERROR(@"Failed to execute statement - %s", sqlite3_errmsg(self.connection));
+        _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
+        
+        LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
+        
         sqlite3_finalize(statement);
+        
         return NO;
     }
     
     sqlite3_finalize(statement);
-    statement = NULL;
     
     return YES;
 }
@@ -239,18 +254,22 @@
     sqlite3_stmt *statement = [self statementWithSql:sql args:args];
     
     if ( !statement )
-        return NO;
+        return nil;
     
     int status = sqlite3_step(statement);
     
     if ( status != SQLITE_ROW )
     {
-        LOG_ERROR(@"Failed to execute statement - %s", sqlite3_errmsg(self.connection));
+        _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
+        
+        LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
+        
         sqlite3_finalize(statement);
+        
         return nil;
     }
     
-    id value = nil;
+    id value;
     
     switch(sqlite3_column_type(statement, 0))
     {
@@ -271,15 +290,18 @@
             break;
             
         case SQLITE_NULL:
-            value = nil;
+            value = [NSNull null];
+            break;
             
         default:
-            @throw [NSException exceptionWithName:@"UnexpectedValue" reason:@"Unexpected SQLITE type" userInfo:nil];
+        {
+            _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorInvalidSqlArgument];
+            value = nil;
+            break;
+        }
     }
-
     
     sqlite3_finalize(statement);
-    statement = NULL;
     
     return value;
 }

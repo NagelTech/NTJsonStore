@@ -50,7 +50,7 @@ static id mutableDeepCopy(id value)
 -(void)load:(NSArray *)items intoCollection:(NTJsonCollection *)collection
 {
     for(NSDictionary *item in items)
-        [collection insert:item];
+        [collection insert:item error:nil];
 }
 
 -(void)loadDataWithStore:(NTJsonStore *)store

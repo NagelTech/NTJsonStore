@@ -27,13 +27,13 @@ extern dispatch_queue_t NTJsonCollectionSerialQueue;
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 -(void)addQueryableFields:(NSString *)fields;
 
--(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler;
--(void)beginEnsureSchemaWithCompletionHandler:(void (^)(BOOL success))completionHandler;
--(BOOL)ensureSchema;
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSError *error))completionHandler;
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(NSError *error))completionHandler;
+-(BOOL)ensureSchemaWithError:(NSError **)error;
 
--(void)beginInsert:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NTJsonRowId rowid))completionHandler;
--(void)beginInsert:(NSDictionary *)json completionHandler:(void (^)(NTJsonRowId rowid))completionHandler;
--(NTJsonRowId)insert:(NSDictionary *)json;
+-(void)beginInsert:(NSDictionary *)json completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NTJsonRowId rowid, NSError *error))completionHandler;
+-(void)beginInsert:(NSDictionary *)json completionHandler:(void (^)(NTJsonRowId rowid, NSError *error))completionHandler;
+-(NTJsonRowId)insert:(NSDictionary *)json error:(NSError **)error;
 
 -(void)beginInsertBatch:(NSArray *)items completionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler;
 -(void)beginInsertBatch:(NSArray *)items completionHandler:(void (^)(BOOL success))completionHandler;

@@ -9,7 +9,13 @@ To Do 1.0
 
  - Error returns/handling.
  
+ - transaction support? (maybe just for batch operations?)
+
+ - tests
+ 
  - documentation
+
+ - sample application (freebase?)
 
 
 To Do Later Versions

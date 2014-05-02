@@ -162,6 +162,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 -(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
 {
+/***
     __block BOOL allSuccess = YES;
     
     for(NTJsonCollection *collection in self.collections)
@@ -177,6 +178,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
      {
          completionHandler(allSuccess);
      }];
+ ***/
 }
 
 
@@ -189,7 +191,8 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 -(BOOL)ensureSchema
 {
     __block BOOL allSuccess = YES;
-    
+ 
+/***
     for(NTJsonCollection *collection in self.collections)
     {
         [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(BOOL success)
@@ -200,7 +203,8 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
     }
     
     [self sync];
-    
+***/
+ 
     return allSuccess;
 }
 
