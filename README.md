@@ -4,12 +4,16 @@ NTJsonStore
 [In development] A No-SQL-like JSON data store, transparently leveraging SQLITE for storage and indexing.
 
 
-To Do
+To Do 1.0
 =====
 
- - Threading.
- 
  - Error returns/handling.
+ 
+ - documentation
+
+
+To Do Later Versions
+====================
 
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
@@ -20,25 +24,26 @@ To Do
    each time. (Load a hash of keys -> rowid's once then do a lookup.)
    
  - intelligent query cache clearing. Notice what columns have changed and only clear impacted queries. (Maybe not necesary?)
- 
- - Fucking dates in JSON. What to do?
 
- - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
- 
  - Aggregate returns, ie "sum(user.age)"
- 
- - Add method to determine if JSON is the current value. (NTJsonCollection isJsonCurrent:) This will enable higher-level caching (Model level)
  
  - Add notifications when collections or objects are modified. This also enables caching.
  
  - Add notifications when query results are changed. (This becomes possible with robus query caching.)
  
 
+
+
 Don't Do
 ========
 
  - Support partial responses (return subset of JSON.) This will complicate caching and may actually degrade performance overall.
  
+ - Fucking dates in JSON. What to do? We support the pure JSON format.
+
+ - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
+ 
+
  
 Done
 ====
@@ -46,3 +51,10 @@ Done
  - Cache JSON objects. Only deserialize and return an object once. (While in memory, we can always return the same object.)
    Cache disposed objects as well for a defined amount of time. Update the cache on insert/update.
    
+ - Threading.
+ 
+  - Add method to determine if JSON is the current value. (NTJsonCollection isJsonCurrent:) This will enable higher-level caching (Model level)
+ 
+
+ 
+
