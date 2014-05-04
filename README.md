@@ -7,6 +7,10 @@ NTJsonStore
 To Do 1.0
 =========
 
+ - deal with retain cycle between Store and Collections appropriately.
+
+ - allow path for store to be set.
+ 
  - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense? Maybe to help make transations work
  
  - maintain count locally?

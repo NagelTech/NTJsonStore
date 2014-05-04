@@ -46,6 +46,16 @@
 }
 
 
+-(void)dealloc
+{
+    if ( _db )
+    {
+        sqlite3_close(_db);
+        _db = nil;
+    }
+}
+
+
 -(void)validateQueue
 {
     // Make sure the connection is being accessed on the correct queue...
@@ -81,7 +91,7 @@
             return nil;
         }
         
-        LOG_DBG(@"Database opened for connection %@", _connectionName);
+        LOG_DBG(@"Database opened for connection %@, location %@", _connectionName, self.filename);
         
         NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
         
@@ -103,7 +113,7 @@
     if ( !sql )
         sql = @"";
     
-#ifdef DEBUG_SQL
+#ifdef NTJsonStore_SHOW_SQL
     
     if ( [args count] )
     {
@@ -142,11 +152,11 @@
             offset = pos.location + value.length;
         }
         
-        NTLogDebug(@"%@", expSql);
+        LOG_DBG(@"%@", expSql);
     }
     
     else
-        NTLogDebug(@"%@", sql);
+        LOG_DBG(@"%@", sql);
     
 #endif
     
@@ -310,6 +320,10 @@
     }
     
     sqlite3_finalize(statement);
+    
+#ifdef NTJsonStore_SHOW_SQL
+    LOG_DBG(@"    = %@", value ?: @"(null)");
+#endif
     
     return value;
 }

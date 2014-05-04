@@ -14,7 +14,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 @interface NTJsonCollection ()
 {
-    NTJsonStore *_store;
+    NTJsonStore *_store;    // should this be weak?
     NTJsonSqlConnection *_connection;
 
     BOOL _isNewCollection;
