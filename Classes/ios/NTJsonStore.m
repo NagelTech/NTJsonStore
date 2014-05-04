@@ -53,7 +53,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 {
     if ( !_connection )
     {
-        _connection = [[NTJsonSqlConnection alloc] initWithFilename:self.storeFilename connectionName:@"[system]"];
+        _connection = [[NTJsonSqlConnection alloc] initWithFilename:self.storeFilename connectionName:@"__store__"];
     }
     
     return _connection;

@@ -27,6 +27,13 @@
 @end
 
 
+#ifdef NTJsonStore_SHOW_SQL
+#   define LOG_SQL(format, ...) NSLog(@"Sql[%@]: " format, self.connectionName, ##__VA_ARGS__)
+#else
+#   define LOG_SQL(format, ...)
+#endif
+
+
 @implementation NTJsonSqlConnection
 
 
@@ -38,7 +45,7 @@
     {
         _filename = filename;
         _connectionName = connectionName;
-        _queueName = [NSString stringWithFormat:@"com.nageltech.NTJsonStore.%@", connectionName];
+        _queueName = [NSString stringWithFormat:@"com.nageltech.NTJsonStore:%@@%@", connectionName, filename];
         _queue = dispatch_queue_create(_queueName.UTF8String, DISPATCH_QUEUE_SERIAL);
     }
     
@@ -91,15 +98,15 @@
             return nil;
         }
         
-        LOG_DBG(@"Database opened for connection %@, location %@", _connectionName, self.filename);
+        LOG_SQL(@"Database opened, location %@", self.filename);
         
-        NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
-        
-        if ( ![journalMode isEqualToString:@"wal"] )
-        {
-            LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
-            // do not fail in this case.
-        }
+//        NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
+//        
+//        if ( ![journalMode isEqualToString:@"wal"] )
+//        {
+//            LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
+//            // do not fail in this case.
+//        }
     }
     
     return _db;
@@ -112,6 +119,12 @@
     
     if ( !sql )
         sql = @"";
+    
+    if ( ![sql hasSuffix:@";"] )
+        sql = [sql stringByAppendingString:@";"];
+    
+    if ( !self.db )
+        return NULL;    // avoid even calling prepare
     
 #ifdef NTJsonStore_SHOW_SQL
     
@@ -152,19 +165,13 @@
             offset = pos.location + value.length;
         }
         
-        LOG_DBG(@"%@", expSql);
+        LOG_SQL(@"%@", expSql);
     }
     
     else
-        LOG_DBG(@"%@", sql);
+        LOG_SQL(@"%@", sql);
     
 #endif
-    
-    if ( ![sql hasSuffix:@";"] )
-        sql = [sql stringByAppendingString:@";"];
-    
-    if ( !self.db )
-        return NULL;    // avoid even calling prepare
     
     NSUInteger status = sqlite3_prepare_v2(self.db, [sql cStringUsingEncoding:NSUTF8StringEncoding], (int)sql.length, &statement, NULL);
     
@@ -321,9 +328,7 @@
     
     sqlite3_finalize(statement);
     
-#ifdef NTJsonStore_SHOW_SQL
-    LOG_DBG(@"    = %@", value ?: @"(null)");
-#endif
+    LOG_SQL(@"    = %@", value ?: @"(null)");
     
     return value;
 }

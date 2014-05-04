@@ -769,7 +769,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         return 0;
     
     NSMutableArray *columnNames = [NSMutableArray arrayWithObject:@"__json__"];
-    [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return column.name; }]];
+    [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return [NSString stringWithFormat:@"[%@]", column.name]; }]];
     
     NSString *sql = [NSString stringWithFormat:@"INSERT INTO [%@] (%@) VALUES (%@);",
                      self.name,

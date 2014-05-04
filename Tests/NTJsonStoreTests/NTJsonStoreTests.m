@@ -33,8 +33,8 @@
 {
     @autoreleasepool
     {
-        NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"test1.db"];
-        NTJsonCollection *collection1 = [store collectionWithName:@"col1"];
+        NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"test.db"];
+        NTJsonCollection *collection1 = [store collectionWithName:@"collection1"];
         
         [collection1 removeAll];
         [collection1 addUniqueIndexWithKeys:@"[uid]"];
@@ -57,8 +57,6 @@
                 XCTAssert(error == nil, @"error is not nil"); // srror should be nil on all successful calls
         }
     }
-    
-    NSLog(@"All done");
     
 }
 
