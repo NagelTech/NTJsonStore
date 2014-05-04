@@ -10,6 +10,6 @@ Pod::Spec.new do |s|
   s.requires_arc        = true
   s.libraries           = 'sqlite3'
 
-  s.source_files        = '*.{h,m}'
+  s.source_files        = 'Classes/ios/*.{h,m}'
   s.public_header_files = 'NTJsonStore.h', 'NTJsonCollection.h', 'NTJsonStoreTypes.h'
 end

@@ -14,15 +14,21 @@
 @interface NTJsonSqlConnection : NSObject
 
 @property (nonatomic,readonly) NSString *filename;
-@property (nonatomic,readonly) sqlite3 *connection;
 @property (nonatomic,readonly) dispatch_queue_t queue;
 @property (nonatomic,readonly) NSString *connectionName;
+@property (nonatomic,readonly) NSError *lastError;
+
+-(sqlite3 *)db;
 
 -(id)initWithFilename:(NSString *)filename connectionName:(NSString *)connectionName;
 
 -(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
 -(id)execValueSql:(NSString *)sql args:(NSArray *)args;
+
+-(NSString *)beginTransaction;
+-(BOOL)commitTransation:(NSString *)transactionId;
+-(BOOL)rollbackTransation:(NSString *)transactionId;
 
 -(void)dispatchSync:(void (^)())block;
 -(void)dispatchAsync:(void (^)())block;

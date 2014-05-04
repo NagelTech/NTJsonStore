@@ -160,48 +160,59 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 #pragma mark - ensureSchema
 
 
--(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(BOOL success))completionHandler
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *errors))completionHandler
 {
-    __block BOOL allSuccess = YES;
+    __block NSMutableArray *errors = nil;
     
     for(NTJsonCollection *collection in self.collections)
     {
-        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(BOOL success)
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(NSError *error)
          {
-             if ( !success )
-                 allSuccess = NO;
+             if ( error )
+             {
+                 if (!errors )
+                     errors = [NSMutableArray array];
+                 
+                 [errors addObject:errors];
+             }
          }];
     }
     
     [self beginSyncWithCompletionQueue:completionQueue completionHandler:^
      {
-         completionHandler(allSuccess);
+         completionHandler([errors copy]);
      }];
+
 }
 
 
--(void)beginEnsureSchemaWithCompletionHandler:(void (^)(BOOL success))completionHandler
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(NSArray *errors))completionHandler
 {
     [self beginEnsureSchemaWithCompletionQueue:nil completionHandler:completionHandler];
 }
 
 
--(BOOL)ensureSchema
+-(NSArray *)ensureSchema
 {
-    __block BOOL allSuccess = YES;
-    
+    __block NSMutableArray *errors = nil;
+ 
     for(NTJsonCollection *collection in self.collections)
     {
-        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(BOOL success)
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(NSError *error)
          {
-             if ( !success )
-                 allSuccess = NO;
+             if ( error )
+             {
+                 if ( !errors )
+                     errors = [NSMutableArray array];
+                 
+                 [errors addObject:error];
+             }
          }];
     }
     
     [self sync];
-    
-    return allSuccess;
+ 
+    return [errors copy];
 }
 
 

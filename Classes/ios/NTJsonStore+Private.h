@@ -10,6 +10,7 @@
 
 #import "NSArray+NTJsonStorePrivate.h"
 #import "NSDictionary+NTJsonStorePrivate.h"
+#import "NSError+NTJsonStorePrivate.h"
 
 #import "NTJsonStore.h"
 

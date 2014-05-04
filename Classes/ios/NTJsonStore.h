@@ -30,7 +30,9 @@ extern dispatch_queue_t NTJsonStoreSerialQueue;
 
 -(NTJsonCollection *)collectionWithName:(NSString *)collectionName;
 
--(BOOL)ensureSchema;
+-(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *errors))completionHandler;
+-(void)beginEnsureSchemaWithCompletionHandler:(void (^)(NSArray *errors))completionHandler;
+-(NSArray *)ensureSchema;
 
 +(BOOL)isJsonCurrent:(NSDictionary *)json;
 
