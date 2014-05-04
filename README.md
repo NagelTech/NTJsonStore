@@ -5,11 +5,11 @@ NTJsonStore
 
 
 To Do 1.0
-=====
+=========
 
- - Error returns/handling.
+ - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense? Maybe to help make transations work
  
- - transaction support? (maybe just for batch operations?)
+ - maintain count locally?
 
  - tests
  
@@ -21,6 +21,9 @@ To Do 1.0
 To Do Later Versions
 ====================
 
+ - Transactions will be a block - return true to commit, false to rollback. They should work at the store level, across collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error;
+   and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
+ 
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
    
@@ -36,8 +39,6 @@ To Do Later Versions
  - Add notifications when collections or objects are modified. This also enables caching.
  
  - Add notifications when query results are changed. (This becomes possible with robus query caching.)
- 
-
 
 
 Don't Do
@@ -50,7 +51,6 @@ Don't Do
  - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
  
 
- 
 Done
 ====
 
@@ -61,6 +61,8 @@ Done
  
   - Add method to determine if JSON is the current value. (NTJsonCollection isJsonCurrent:) This will enable higher-level caching (Model level)
  
-
+  - Error returns/handling.
+ 
+ - transaction support for insertBatch
  
 

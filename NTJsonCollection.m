@@ -850,10 +850,13 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(BOOL)_insertBatch:(NSArray *)items
 {
-    // todo: put this all in a transaction.
-    
     if ( !items.count )
         return YES;
+    
+    NSString *transactionId = [self.connection beginTransaction];
+    
+    if ( !transactionId )
+        return NO;
     
     for(NSDictionary *item in items)
     {
@@ -861,10 +864,12 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         
         if ( !rowid )
         {
-            // rollback
+            [self.connection rollbackTransation:transactionId];
             return NO;
         }
     }
+    
+    [self.connection commitTransation:transactionId];
     
     return YES;
 }

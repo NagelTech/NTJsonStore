@@ -17,6 +17,7 @@
     NSString *_filename;
     NSString *_queueName;
     NSError *_lastError;
+    int _nextTransactionId;
     
     dispatch_queue_t _queue;
 }
@@ -45,7 +46,7 @@
 }
 
 
--(sqlite3 *)db
+-(void)validateQueue
 {
     // Make sure the connection is being accessed on the correct queue...
     // if this happens it means our code i broken...
@@ -57,6 +58,13 @@
     NSAssert(strcmp(queueName, _queueName.UTF8String) == 0, @"Attempt to access SQL connection from the wrong queue.");
     
 #endif
+    
+}
+
+
+-(sqlite3 *)db
+{
+    [self validateQueue];
     
     if ( !_db )
     {
@@ -304,6 +312,30 @@
     sqlite3_finalize(statement);
     
     return value;
+}
+
+
+-(NSString *)beginTransaction
+{
+    [self validateQueue]; // do this before we access _nextTransactionId
+    
+    NSString *transactionId = [NSString stringWithFormat:@"%@_%04d", self.connectionName, _nextTransactionId++];
+    
+    BOOL success = [self execSql:[NSString stringWithFormat:@"SAVEPOINT %@;", transactionId] args:nil];
+    
+    return (success) ? transactionId : nil;
+}
+
+
+-(BOOL)commitTransation:(NSString *)transactionId
+{
+    return [self execSql:[NSString stringWithFormat:@"RELEASE SAVEPOINT %@;", transactionId] args:nil];
+}
+
+
+-(BOOL)rollbackTransation:(NSString *)transactionId
+{
+    return [self execSql:[NSString stringWithFormat:@"ROLLBACK TO SAVEPOINT %@; RELEASE SAVEPOINT %@;", transactionId, transactionId] args:nil];
 }
 
 

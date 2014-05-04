@@ -26,6 +26,10 @@
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
 -(id)execValueSql:(NSString *)sql args:(NSArray *)args;
 
+-(NSString *)beginTransaction;
+-(BOOL)commitTransation:(NSString *)transactionId;
+-(BOOL)rollbackTransation:(NSString *)transactionId;
+
 -(void)dispatchSync:(void (^)())block;
 -(void)dispatchAsync:(void (^)())block;
 
