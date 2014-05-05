@@ -9,16 +9,6 @@
 #import <sqlite3.h>
 #import <Foundation/Foundation.h>
 
-extern NSString *NTJsonStoreErrorDomain;        // code = NTJsonStoreErrorCode
-extern NSString *NTJsonStoreSqliteErrorDomain;  // code = SQLITE_??? error
-
-
-typedef enum
-{
-    NTJsonStoreErrorInvalidSqlArgument = 1,
-    NTJsonStoreErrorInvalidSqlResult = 2,
-} NTJsonStoreErrorCode;
-
 
 @interface NSError (NTJsonStorePrivate)
 

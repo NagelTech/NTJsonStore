@@ -22,4 +22,6 @@
 -(id)initWithStore:(NTJsonStore *)store name:(NSString *)name;
 -(id)initNewCollectionWithStore:(NTJsonStore *)store name:(NSString *)name;
 
+-(void)close;
+
 @end

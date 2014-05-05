@@ -10,3 +10,17 @@
 #import <Foundation/Foundation.h>
 
 typedef int64_t NTJsonRowId;
+
+extern NSString *NTJsonStoreErrorDomain;        // code = NTJsonStoreErrorCode
+extern NSString *NTJsonStoreSqliteErrorDomain;  // code = SQLITE_??? error
+
+
+typedef enum
+{
+    NTJsonStoreErrorInvalidSqlArgument = 1,
+    NTJsonStoreErrorInvalidSqlResult = 2,
+    NTJsonStoreErrorClosed = 3,     // connection or store closed
+} NTJsonStoreErrorCode;
+
+
+

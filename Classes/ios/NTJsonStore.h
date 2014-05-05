@@ -28,6 +28,8 @@ extern dispatch_queue_t NTJsonStoreSerialQueue;
 
 -(id)initWithName:(NSString *)storeName;
 
+-(void)close;
+
 -(NTJsonCollection *)collectionWithName:(NSString *)collectionName;
 
 -(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSArray *errors))completionHandler;

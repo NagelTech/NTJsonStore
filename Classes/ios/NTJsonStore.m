@@ -15,6 +15,8 @@
 {
     NTJsonSqlConnection *_connection;
     NSMutableDictionary *_internalCollections;
+    BOOL _isClosing;
+    BOOL _isClosed;
 }
 
 @property (nonatomic,readonly) NSMutableDictionary *internalCollections;
@@ -43,6 +45,38 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 }
 
 
+-(void)close
+{
+    if ( _isClosed || _isClosing )
+        return ;
+    
+    if ( !_connection && !_internalCollections )
+    {
+        _isClosed = YES;
+        return ;    // never initialized
+    }
+    
+    _isClosing = YES;
+    
+    [self.connection dispatchSync:^
+    {
+        if ( _internalCollections )
+        {
+            for(NTJsonCollection *collection in _internalCollections.allValues)
+                [collection close];
+        }
+        
+        [self.connection close];
+        
+        _connection = nil;
+        _internalCollections = nil;
+        
+        _isClosed = YES;
+        _isClosing = NO;
+    }];
+}
+
+
 -(NSString *)storeFilename
 {
     return [NSString stringWithFormat:@"%@%@", self.storePath, self.storeName];
@@ -68,16 +102,17 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 -(NSMutableDictionary *)internalCollections
 {
-    @synchronized(self)
-    {
+    __block NSMutableDictionary *internalCollections;
+
+    [self.connection dispatchSync:^{
         if ( !_internalCollections )
         {
-            _internalCollections = [NSMutableDictionary dictionary];
-            
-            [self.connection dispatchSync:^
+            if ( [self validateEnvironment] )
             {
+                _internalCollections = [NSMutableDictionary dictionary];
+
                 sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'  AND name <> ? ORDER BY 1;" args:@[NTJsonStore_MetadataTableName]];
-                
+                    
                 int status;
                 
                 while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
@@ -90,11 +125,13 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
                 }
                 
                 sqlite3_finalize(statement);
-            }];
+            }
         }
         
-        return _internalCollections;
-    }
+        internalCollections = _internalCollections;
+    }];
+     
+    return internalCollections;
 }
 
 
@@ -106,25 +143,26 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 -(NTJsonCollection *)collectionWithName:(NSString *)collectionName
 {
-    @synchronized(self)
-    {
-        collectionName = [collectionName lowercaseString];
+    __block NTJsonCollection *collection;
+    
+    [self.connection dispatchSync:^{
+        NSString *name = [collectionName lowercaseString];
         
-        NTJsonCollection *collection = self.internalCollections[collectionName];
+        collection = self.internalCollections[name];
         
-        if ( collection )
-            return collection;
-        
-        // If collection was not found, create it...
-        
-        LOG(@"Creating collection: %@", collectionName);
-        
-        collection = [[NTJsonCollection alloc] initNewCollectionWithStore:self name:collectionName];
-        
-        self.internalCollections[collectionName] = collection;
-        
-        return collection;
-    }
+        if ( !collection )
+        {
+            // If collection was not found, create it...
+            
+            LOG(@"Creating collection: %@", name);
+            
+            collection = [[NTJsonCollection alloc] initNewCollectionWithStore:self name:name];
+            
+            self.internalCollections[name] = collection;
+        }
+    }];
+    
+    return collection;
 }
 
 
@@ -154,6 +192,15 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
         return dispatch_get_main_queue();
     
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+}
+
+
+-(BOOL)validateEnvironment
+{
+    if ( _isClosed || _isClosing )
+        return NO;
+    
+    return YES;
 }
 
 

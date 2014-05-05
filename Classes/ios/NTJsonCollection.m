@@ -14,7 +14,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 @interface NTJsonCollection ()
 {
-    NTJsonStore *_store;    // should this be weak?
+    NTJsonStore __weak *_store;
     NTJsonSqlConnection *_connection;
 
     BOOL _isNewCollection;
@@ -24,6 +24,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     NTJsonObjectCache *_objectCache;
     NSDictionary *_defaultJson;
     NSError *_lastError;
+    
+    BOOL _isClosing;
+    BOOL _isClosed;
     
     NSMutableDictionary *_metadata;
     
@@ -78,6 +81,12 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     }
     
     return self;
+}
+
+
+-(void)dealloc
+{
+    [self close];   // just to be sure
 }
 
 
@@ -142,6 +151,62 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     }
     
     return flat;
+}
+
+
+-(BOOL)validateEnvironment
+{
+    if ( _isClosed || _isClosing )
+    {
+        _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorClosed];
+        return NO;
+    }
+    
+    if ( !_store )
+    {
+        // The store has been deallocated and things are now a mess.
+        
+        _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorClosed];
+        return NO;
+    }
+    
+    return YES;
+}
+
+
+#pragma mark - close
+
+
+-(void)close
+{
+    if ( _isClosing || _isClosed )
+        return ; // already in the process of closing or we are closed...
+    
+    _isClosing = YES; // do not accept new requests.
+    
+    // by doing this on our queue, we can be sure that any items that were already queued have completed...
+    
+    [self.connection dispatchSync:^
+    {
+        [self.connection close];
+        
+        // release all memory associated with this connection
+        
+        _store = nil;
+        _connection = nil;
+        _columns = nil;
+        _indexes = nil;
+        _objectCache = nil;
+        _defaultJson = nil;
+        _metadata = nil;
+        _pendingColumns = nil;
+        _pendingIndexes = nil;
+        
+        _isClosed = YES;
+        _isClosing = NO;
+    }];
+    
+    return ;
 }
 
 
@@ -470,6 +535,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(BOOL)_ensureSchema
 {
+    if ( ![self validateEnvironment] )
+        return NO;
+    
     if ( ![self schema_createCollection] )
         return NO;
     
@@ -538,32 +606,37 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
         
         if ( !_columns )
         {
-            NSMutableArray *columns = [NSMutableArray array];
-            sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
-            
-            if ( !statement )
+            if ( [self validateEnvironment] )
             {
-                _lastError = self.connection.lastError;
-                columns = nil;
-                return ;
-            }
-            
-            int status;
-            
-            while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
-            {
-                NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
+                NSMutableArray *columns = [NSMutableArray array];
+                sqlite3_stmt *statement = [self.connection statementWithSql:[NSString stringWithFormat:@"PRAGMA table_info(%@);", self.name] args:nil];
                 
-                if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
-                    continue;
+                if ( !statement )
+                {
+                    _lastError = self.connection.lastError;
+                    columns = nil;
+                    return ;
+                }
                 
-                [columns addObject:[NTJsonColumn columnWithName:columnName]];
-            }
+                int status;
+                
+                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                {
+                    NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
+                    
+                    if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
+                        continue;
+                    
+                    [columns addObject:[NTJsonColumn columnWithName:columnName]];
+                }
+                
+                _columns = [columns copy];
+                
+                sqlite3_finalize(statement);
+                
+            } // if validateEnv
             
-            _columns = [columns copy];
-            
-            sqlite3_finalize(statement);
-        }
+        } // if !columns
         
         columns = _columns;
     }];
@@ -658,43 +731,50 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     __block NSArray *indexes;
     
     [self.connection dispatchSync:^{
+        
         if ( !_indexes )
         {
-            NSMutableArray *indexes = [NSMutableArray array];
             
-            sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
-            
-            if ( !statement )
+            if ( [self validateEnvironment] )
             {
-                _lastError = self.connection.lastError;
-                indexes = nil;
-                return ;
-            }
-            
-            int status;
-            
-            while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
-            {
-                NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
+                NSMutableArray *indexes = [NSMutableArray array];
                 
-                if ( !sql.length )
-                    continue ;
+                sqlite3_stmt *statement = [self.connection statementWithSql:@"SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=?" args:@[self.name]];
                 
-                NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
-                
-                if ( !index )
+                if ( !statement )
                 {
-                    LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
-                    continue;
+                    _lastError = self.connection.lastError;
+                    indexes = nil;
+                    return ;
                 }
                 
-                [indexes addObject:index];
-            }
+                int status;
+                
+                while ( (status=sqlite3_step(statement)) == SQLITE_ROW )
+                {
+                    NSString *sql = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 0)];
+                    
+                    if ( !sql.length )
+                        continue ;
+                    
+                    NTJsonIndex *index = [NTJsonIndex indexWithSql:sql];
+                    
+                    if ( !index )
+                    {
+                        LOG_ERROR(@"Ignoring index we can't parse - %@", sql);
+                        continue;
+                    }
+                    
+                    [indexes addObject:index];
+                }
+                
+                sqlite3_finalize(statement);
+                
+                _indexes = [indexes copy];
+                
+            } // if validate...
             
-            sqlite3_finalize(statement);
-            
-            _indexes = [indexes copy];
-        }
+        } // if !indexes
         
         indexes = _indexes;
     }];
@@ -765,6 +845,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(NTJsonRowId)_insert:(NSDictionary *)json
 {
+    // Be careful of any side effects in this code impacting memory (caching, etc). It is used by
+    // insertBatch which runs in a transaction so we need to be safe for rollbacks.
+    
     if ( ![self _ensureSchema] )
         return 0;
     
@@ -853,6 +936,9 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
     if ( !items.count )
         return YES;
     
+    if ( ![self validateEnvironment] )
+        return NO;
+    
     NSString *transactionId = [self.connection beginTransaction];
     
     if ( !transactionId )
@@ -922,7 +1008,8 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(BOOL)_update:(NSDictionary *)json
 {
-    [self _ensureSchema];
+    if ( ![self _ensureSchema] )
+        return NO;
     
     NTJsonRowId rowid = [json[@"__rowid__"] longLongValue];
     
@@ -1006,7 +1093,8 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(BOOL)_remove:(NSDictionary *)json
 {
-    [self _ensureSchema];
+    if( ![self _ensureSchema] )
+        return NO;
     
     long long rowid = [json[@"__rowid__"] longLongValue];
 
@@ -1334,7 +1422,8 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 {
     [self scanSqlForNewColumns:where];
     
-    [self _ensureSchema];
+    if ( ![self _ensureSchema] )
+        return -1;
     
     NSMutableString *sql = [NSMutableString stringWithFormat:@"DELETE FROM [%@] ", self.name];
     

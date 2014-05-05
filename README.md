@@ -7,14 +7,10 @@ NTJsonStore
 To Do 1.0
 =========
 
- - deal with retain cycle between Store and Collections appropriately.
-
  - allow path for store to be set.
  
  - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense? Maybe to help make transations work
  
- - maintain count locally?
-
  - tests
  
  - documentation
@@ -25,9 +21,8 @@ To Do 1.0
 To Do Later Versions
 ====================
 
- - Transactions will be a block - return true to commit, false to rollback. They should work at the store level, across collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error;
-   and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock;
- 
+ - maintain count in memory when we know it.
+
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
    
@@ -54,6 +49,10 @@ Don't Do
 
  - Add a way to return mutable JSON data. Return immutable by default to make caching work better.
  
+ - Transaction support causes lots of issues with caching and concurrency. It's probably not a good idea to complicate the codebase with it.
+   If we did, here are some ideas:  - Transactions will be a block - return true to commit, false to rollback. They should work at the store level, across 
+   collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error; and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock; Caching would ither beread only or have
+   transaction support.
 
 Done
 ====
@@ -68,5 +67,10 @@ Done
   - Error returns/handling.
  
  - transaction support for insertBatch
+ 
+  - deal with retain cycle between Store and Collections appropriately. Best idea so far: Collections maintain weak links to the Store. Application must
+   maintain an explicit reference to thet store to keep it open. Add an explicit command to close a store which would close all collections as well.
+
+
  
 

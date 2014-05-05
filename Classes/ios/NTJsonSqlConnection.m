@@ -10,9 +10,12 @@
 #import "NTJsonStore+Private.h"
 
 
+static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
+
+
 @interface NTJsonSqlConnection ()
 {
-    sqlite3 *_db;
+    sqlite3 *_db; // nil = auto open, other = connection, CONNECTION_CLOSED = closed or failed to open
     NSString *_connectionName;
     NSString *_filename;
     NSString *_queueName;
@@ -55,10 +58,27 @@
 
 -(void)dealloc
 {
+    [self close];
+}
+
+
+-(BOOL)open
+{
+    if ( _db == CONNECTION_CLOSED )
+        _db = nil; // reset to auto open
+    
+    return (self.db) ? YES : NO;
+}
+
+
+-(void)close
+{
     if ( _db )
     {
-        sqlite3_close(_db);
-        _db = nil;
+        if ( _db != CONNECTION_CLOSED )
+            sqlite3_close(_db);
+        
+        _db = CONNECTION_CLOSED;    // explicitly closed not (no auto open)
     }
 }
 
@@ -66,7 +86,7 @@
 -(void)validateQueue
 {
     // Make sure the connection is being accessed on the correct queue...
-    // if this happens it means our code i broken...
+    // if this happens it means our code is broken...
     
 #ifdef DEBUG
     
@@ -79,12 +99,20 @@
 }
 
 
+-(BOOL)exists
+{
+    return [[NSFileManager defaultManager] fileExistsAtPath:self.filename];
+}
+
+
 -(sqlite3 *)db
 {
     [self validateQueue];
     
-    if ( !_db )
+    if ( !_db ) // nil = auto open
     {
+        BOOL newDatabase = ![self exists];
+        
         int status = sqlite3_open_v2([self.filename cStringUsingEncoding:NSUTF8StringEncoding], &_db, SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_NOMUTEX, NULL);
         
         if ( status != SQLITE_OK )
@@ -93,23 +121,33 @@
             
             LOG_ERROR(@"Failed to open database: %@", _lastError.localizedDescription);
             
-            _db = nil;
+            _db = CONNECTION_CLOSED;
 
             return nil;
         }
         
         LOG_SQL(@"Database opened, location %@", self.filename);
         
-//        NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
-//        
-//        if ( ![journalMode isEqualToString:@"wal"] )
-//        {
-//            LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
-//            // do not fail in this case.
-//        }
+        if ( newDatabase )
+        {
+            NSString *journalMode = [self execValueSql:@"PRAGMA journal_mode=wal;" args:nil];
+            
+            if ( ![journalMode isEqualToString:@"wal"] )
+            {
+                LOG_ERROR(@"Unable to enable WAL mode, current mode - %@", journalMode);
+                // do not fail in this case.
+            }
+            else
+                LOG_SQL(@"WAL mode enabled.");
+        }
     }
     
-    return _db;
+    else if ( _db == CONNECTION_CLOSED )
+    {
+        _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorClosed];
+    }
+    
+    return (_db == CONNECTION_CLOSED) ? nil : _db;
 }
 
 
@@ -259,7 +297,7 @@
     
     if ( status != SQLITE_DONE && status != SQLITE_ROW )
     {
-        _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
+        _lastError = [NSError NSJsonStore_errorWithSqlite3:self.db];
         
         LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
         
@@ -285,7 +323,7 @@
     
     if ( status != SQLITE_ROW )
     {
-        _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
+        _lastError = [NSError NSJsonStore_errorWithSqlite3:self.db];
         
         LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
         

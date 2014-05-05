@@ -17,10 +17,14 @@
 @property (nonatomic,readonly) dispatch_queue_t queue;
 @property (nonatomic,readonly) NSString *connectionName;
 @property (nonatomic,readonly) NSError *lastError;
+@property (nonatomic,readonly) BOOL isOpen;
 
 -(sqlite3 *)db;
 
 -(id)initWithFilename:(NSString *)filename connectionName:(NSString *)connectionName;
+
+-(BOOL)open;
+-(void)close;
 
 -(sqlite3_stmt *)statementWithSql:(NSString *)sql args:(NSArray *)args;
 -(BOOL)execSql:(NSString *)sql args:(NSArray *)args;
