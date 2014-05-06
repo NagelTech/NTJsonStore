@@ -9,6 +9,8 @@
 #import <sqlite3.h>
 #import <Foundation/Foundation.h>
 
+#import "NTJsonStoreTypes.h"
+
 
 @interface NSError (NTJsonStorePrivate)
 

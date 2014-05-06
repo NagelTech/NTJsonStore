@@ -9,7 +9,7 @@ To Do 1.0
 
  - allow path for store to be set.
  
- - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense? Maybe to help make transations work
+ - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense?
  
  - tests
  

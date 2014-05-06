@@ -6,10 +6,11 @@
 //  Copyright (c) 2014 NagelTech. All rights reserved.
 //
 
-#import "NSError+NTJsonStorePrivate.h"
+#import "NTJsonStore+Private.h"
 
 
 NSString *NTJsonStoreErrorDomain = @"NTJsonStoreErrorDomain";
+NSString *NTJsonStoreSqliteErrorDomain = @"NTJsonStoreSqliteErrorDomain";
 
 
 @implementation NSError (NTJsonStorePrivate)
