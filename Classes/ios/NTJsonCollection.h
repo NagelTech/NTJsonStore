@@ -14,9 +14,6 @@
 @class NTJsonStore;
 
 
-extern dispatch_queue_t NTJsonCollectionSerialQueue;
-
-
 @interface NTJsonCollection : NSObject
 
 @property (nonatomic,readonly) NSString *name;

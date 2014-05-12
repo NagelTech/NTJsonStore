@@ -213,7 +213,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
     
     for(NTJsonCollection *collection in self.collections)
     {
-        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(NSError *error)
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonStoreSerialQueue completionHandler:^(NSError *error)
          {
              if ( error )
              {
@@ -245,7 +245,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
  
     for(NTJsonCollection *collection in self.collections)
     {
-        [collection beginEnsureSchemaWithCompletionQueue:NTJsonCollectionSerialQueue completionHandler:^(NSError *error)
+        [collection beginEnsureSchemaWithCompletionQueue:NTJsonStoreSerialQueue completionHandler:^(NSError *error)
          {
              if ( error )
              {

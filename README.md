@@ -9,6 +9,12 @@ To Do 1.0
 
  - allow path for store to be set.
  
+ - Support either an NSDictionary or NSArray as the root of a JSON object.
+ 
+ - Investgate replacing NSProxy objects with native implementations to improve performance. Or, implement "Fast global proxy forwarding"? NTFastProxy
+ 
+ - Allow setting size of cache or disabling it entirely. Value = cache size, 0 = no caching but track used objects, -1 = no caching at all.
+ 
  - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense?
  
  - tests

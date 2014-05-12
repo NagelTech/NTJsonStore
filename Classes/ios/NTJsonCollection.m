@@ -9,9 +9,6 @@
 #import "NTJsonStore+Private.h"
 
 
-dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue";
-
-
 @interface NTJsonCollection ()
 {
     NTJsonStore __weak *_store;
@@ -101,7 +98,7 @@ dispatch_queue_t NTJsonCollectionSerialQueue = (id)@"NTJsonCollectionSerialQueue
 
 -(dispatch_queue_t)getCompletionQueue:(dispatch_queue_t)completionQueue
 {
-    if ( (id)completionQueue == (id)NTJsonCollectionSerialQueue )
+    if ( (id)completionQueue == (id)NTJsonStoreSerialQueue )
         return self.connection.queue;   // a little magic here
     
     if ( completionQueue )
