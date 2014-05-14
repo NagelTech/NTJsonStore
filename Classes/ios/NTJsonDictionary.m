@@ -10,7 +10,7 @@
 #import "NTJsonStore+Private.h"
 
 
-#define dict ((NSDictionary *)_cacheItem->_json)
+#define dict _cacheItem->_json
 
 
 @interface NTJsonDictionary ()

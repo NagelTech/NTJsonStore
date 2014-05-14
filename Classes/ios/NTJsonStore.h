@@ -17,16 +17,17 @@ extern dispatch_queue_t NTJsonStoreSerialQueue;
 
 @interface NTJsonStore : NSObject
 
-@property (nonatomic)               NSString *storePath;
-@property (nonatomic)               NSString *storeName;
+@property (nonatomic,readonly)      NSString *storePath;
+@property (nonatomic,readonly)      NSString *storeName;
 
 @property (nonatomic,readonly)      NSString *storeFilename;
-@property (readonly,nonatomic)      BOOL exists;
+@property (nonatomic,readonly)      BOOL exists;
 
 @property (nonatomic,readonly)      NSArray *collections;
 
-
+-(id)init;
 -(id)initWithName:(NSString *)storeName;
+-(id)initWithPath:(NSString *)storePath name:(NSString *)storeName;
 
 -(void)close;
 

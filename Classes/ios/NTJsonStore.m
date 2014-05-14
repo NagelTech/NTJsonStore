@@ -31,17 +31,29 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 @implementation NTJsonStore
 
 
--(id)initWithName:(NSString *)storeName
+-(id)initWithPath:(NSString *)storePath name:(NSString *)storeName
 {
     self = [super init];
     
     if ( self )
     {
         _storeName = storeName;
-        _storePath = NSTemporaryDirectory();
+        _storePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]; // default to Caches
     }
     
     return self;
+}
+
+
+-(id)initWithName:(NSString *)storeName
+{
+    return [self initWithPath:[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] name:storeName];
+}
+
+
+-(id)init
+{
+    return [self initWithName:@"NTJsonStore.db"];
 }
 
 
@@ -79,7 +91,7 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 -(NSString *)storeFilename
 {
-    return [NSString stringWithFormat:@"%@%@", self.storePath, self.storeName];
+    return [self.storePath stringByAppendingPathComponent:self.storeName];
 }
 
 
