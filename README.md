@@ -9,13 +9,7 @@ To Do 1.0
 
  - allow path for store to be set.
  
- - Support either an NSDictionary or NSArray as the root of a JSON object.
- 
- - Investgate replacing NSProxy objects with native implementations to improve performance. Or, implement "Fast global proxy forwarding"? NTFastProxy
- 
  - Allow setting size of cache or disabling it entirely. Value = cache size, 0 = no caching but track used objects, -1 = no caching at all.
- 
- - getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense?
  
  - tests
  
@@ -28,7 +22,9 @@ To Do Later Versions
 ====================
 
  - maintain count in memory when we know it.
-
+ 
+ - research: getCompletionQueue to continue using the collection or store queue if already in that context? Does that makes sense?
+ 
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
    
@@ -59,6 +55,11 @@ Don't Do
    If we did, here are some ideas:  - Transactions will be a block - return true to commit, false to rollback. They should work at the store level, across 
    collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error; and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock; Caching would ither beread only or have
    transaction support.
+   
+ - Support either an NSDictionary or NSArray as the root of a JSON object. We can't support array's as the root currently because we tore the rowid in the root
+   of the object.
+ 
+
 
 Done
 ====
@@ -76,6 +77,10 @@ Done
  
   - deal with retain cycle between Store and Collections appropriately. Best idea so far: Collections maintain weak links to the Store. Application must
    maintain an explicit reference to thet store to keep it open. Add an explicit command to close a store which would close all collections as well.
+
+ - Replace NSProxy with custom NSDictionary implementation to improve performance
+ 
+
 
 
  

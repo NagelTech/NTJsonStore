@@ -24,101 +24,6 @@
 static const int DEFAULT_CACHE_SIZE = 50;
 
 
-@interface NTJsonObjectProxy ()
-{
-    NTJsonObjectCacheItem *_cacheItem;
-}
-
--(id)initWithCacheItem:(NTJsonObjectCacheItem *)cacheItem;
-
-@end
-
-
-@interface NTJsonObjectCacheItem : NSObject
-{
-    NTJsonObjectCache __weak *_cache;
-    NTJsonRowId _rowId;
-    NSDictionary *_json;
-    
-    BOOL _isInUse;
-
-    NTJsonObjectProxy __weak *_proxyObject;
-}
-
-@property (nonatomic,readwrite,weak) NTJsonObjectCache *cache;
-@property (nonatomic,readonly) NTJsonRowId rowId;
-@property (nonatomic,readonly) NSDictionary *json;
-
-@property (nonatomic,readwrite) BOOL isInUse;
-
-@property (nonatomic,readonly) NSDictionary *proxyObject;
-
--(id)initWithCache:(NTJsonObjectCache *)cache rowId:(NTJsonRowId)rowId json:(NSDictionary *)json;
-
-@end
-
-
-@interface NTJsonObjectCache ()
-{
-    NSMutableDictionary *_items;
-    NSMutableArray *_cachedItems;
-}
-
--(void)proxyDeallocedForCacheItem:(NTJsonObjectCacheItem *)cacheItem;
-
-@end
-
-
-#pragma mark - NTJsonObjectProxy
-
-
-@implementation NTJsonObjectProxy
-
-
--(id)initWithCacheItem:(NTJsonObjectCacheItem *)cacheItem
-{
-    _cacheItem = cacheItem;
-    
-    return self;
-}
-
-
--(void)forwardInvocation:(NSInvocation *)invocation
-{
-    [invocation setTarget:_cacheItem.json];
-    [invocation invoke];
-}
-
-
--(NSMethodSignature *)methodSignatureForSelector:(SEL)sel
-{
-    return [_cacheItem.json methodSignatureForSelector:sel];
-}
-
-
--(BOOL)isKindOfClass:(Class)aClass
-{
-    if ( aClass == [NTJsonObjectProxy class] )
-        return YES; // so we can detect if we are ourselves ;)
-    
-    return [_cacheItem.json isKindOfClass:aClass];
-}
-
-
--(BOOL)NTJsonObjectProxy_isCurrent
-{
-    return (_cacheItem.cache) ? YES : NO;
-}
-
-
--(void)dealloc
-{
-    [_cacheItem.cache proxyDeallocedForCacheItem:_cacheItem];
-}
-
-
-@end
-
 
 #pragma mark - NTJsonObjectCacheItem
 
@@ -126,17 +31,17 @@ static const int DEFAULT_CACHE_SIZE = 50;
 @implementation NTJsonObjectCacheItem
 
 
--(NSDictionary *)proxyObject
+-(id)proxyObject
 {
-    NTJsonObjectProxy *proxyObject = _proxyObject;
+    id proxyObject = _proxyObject;
     
     if ( !proxyObject )
     {
-        proxyObject = [[NTJsonObjectProxy alloc] initWithCacheItem:self];
+        proxyObject = [[NTJsonDictionary alloc] initWithCacheItem:self];
         _proxyObject = proxyObject;
     }
     
-    return (NSDictionary *)proxyObject;
+    return proxyObject;
 }
 
 

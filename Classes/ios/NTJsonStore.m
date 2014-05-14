@@ -168,12 +168,10 @@ dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 +(BOOL)isJsonCurrent:(NSDictionary *)json
 {
-    if ( ![json isKindOfClass:[NTJsonObjectProxy class]] )
+    if ( ![json respondsToSelector:@selector(NTJson_isCurrent)] )
         return NO;
     
-    NTJsonObjectProxy *proxy = (id)json;
-    
-    return proxy.NTJsonObjectProxy_isCurrent;
+    return [(id)json NTJson_isCurrent];
 }
 
 
