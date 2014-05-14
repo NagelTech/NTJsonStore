@@ -171,6 +171,37 @@
 }
 
 
+-(int)cacheSize
+{
+    return (_objectCache) ? _objectCache.cacheSize : -1;
+}
+
+
+-(void)setCacheSize:(int)cacheSize
+{
+    if ( (cacheSize < 0 && !_objectCache) || (_objectCache.cacheSize == cacheSize) )
+        return;
+    
+    if ( cacheSize < 0 )
+        _objectCache = nil; // no cache
+    
+    else
+    {
+        if ( !_objectCache )
+            _objectCache = [[NTJsonObjectCache alloc] initWithCacheSize:cacheSize];
+        
+        else
+            _objectCache.cacheSize = cacheSize;
+    }
+}
+
+
+-(void)flushCache
+{
+    [_objectCache flush];
+}
+
+
 #pragma mark - close
 
 
@@ -1298,7 +1329,7 @@
                 rawJson = [mutableJson copy];
             }
             
-            json = [_objectCache addJson:rawJson withRowId:rowid];
+            json = (_objectCache) ? [_objectCache addJson:rawJson withRowId:rowid] : rawJson;
         }
         
         [items addObject:json];

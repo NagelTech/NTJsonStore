@@ -7,10 +7,6 @@ NTJsonStore
 To Do 1.0
 =========
 
- - allow path for store to be set.
- 
- - Allow setting size of cache or disabling it entirely. Value = cache size, 0 = no caching but track used objects, -1 = no caching at all.
- 
  - tests
  
  - documentation
@@ -41,6 +37,8 @@ To Do Later Versions
  
  - Add notifications when query results are changed. (This becomes possible with robus query caching.)
 
+ - eliminate ensureSchema support in favor of starting tasks immediately?
+ 
 
 Don't Do
 ========
@@ -80,6 +78,11 @@ Done
 
  - Replace NSProxy with custom NSDictionary implementation to improve performance
  
+ - allow path for store to be set.
+
+ - Allow setting size of cache or disabling it entirely. Value = cache size, 0 = no caching but track used objects, -1 = no caching at all.
+ 
+
 
 
 

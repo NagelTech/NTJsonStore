@@ -91,6 +91,17 @@ static const int DEFAULT_CACHE_SIZE = 50;
 }
 
 
+-(void)setCacheSize:(int)cacheSize
+{
+    if ( cacheSize == _cacheSize )
+        return ;
+    
+    _cacheSize = cacheSize;
+    
+    [self purgeCacheWithFlushAll:NO];
+}
+
+
 -(void)proxyDeallocedForCacheItem:(NTJsonObjectCacheItem *)cacheItem
 {
     CACHE_LOG(@"Caching - %d", (int)cacheItem.rowId);

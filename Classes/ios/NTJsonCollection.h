@@ -20,10 +20,13 @@
 @property (nonatomic,readonly) NTJsonStore *store;
 @property (nonatomic,readonly) NSError *lastError;
 @property (nonatomic) NSDictionary *defaultJson;
+@property (nonatomic) int cacheSize;
 
 -(void)addIndexWithKeys:(NSString *)keys;
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 -(void)addQueryableFields:(NSString *)fields;
+
+-(void)flushCache;
 
 -(void)beginEnsureSchemaWithCompletionQueue:(dispatch_queue_t)completionQueue completionHandler:(void (^)(NSError *error))completionHandler;
 -(void)beginEnsureSchemaWithCompletionHandler:(void (^)(NSError *error))completionHandler;
