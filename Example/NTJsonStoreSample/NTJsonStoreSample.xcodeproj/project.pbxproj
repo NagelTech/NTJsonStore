@@ -28,6 +28,7 @@
 		F0A410731916E9760046480F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F0A410701916E9760046480F /* README.md */; };
 		F0A410741916E9760046480F /* NTJsonStore.podspec in Resources */ = {isa = PBXBuildFile; fileRef = F0A410711916E9760046480F /* NTJsonStore.podspec */; };
 		F0A410751916E9760046480F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = F0A410721916E9760046480F /* LICENSE */; };
+		F0FD0DF61946013600E96BF6 /* NTJsonDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = F0FD0DF41946013600E96BF6 /* NTJsonDictionary.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +70,8 @@
 		F0A410701916E9760046480F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
 		F0A410711916E9760046480F /* NTJsonStore.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = NTJsonStore.podspec; path = ../../NTJsonStore.podspec; sourceTree = "<group>"; };
 		F0A410721916E9760046480F /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = "<group>"; };
+		F0FD0DF41946013600E96BF6 /* NTJsonDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonDictionary.m; sourceTree = "<group>"; };
+		F0FD0DF51946013600E96BF6 /* NTJsonDictionary+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonDictionary+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +157,8 @@
 				F0A410521916E91C0046480F /* NTJsonCollection.m */,
 				F0A4105D1916E91C0046480F /* NTJsonColumn+Private.h */,
 				F0A4105C1916E91C0046480F /* NTJsonColumn.m */,
+				F0FD0DF51946013600E96BF6 /* NTJsonDictionary+Private.h */,
+				F0FD0DF41946013600E96BF6 /* NTJsonDictionary.m */,
 				F0A410661916E91C0046480F /* NTJsonIndex+Private.h */,
 				F0A410651916E91C0046480F /* NTJsonIndex.m */,
 				F0A4105F1916E91C0046480F /* NTJsonObjectCache+Private.h */,
@@ -245,6 +250,7 @@
 				F0A410691916E91C0046480F /* NTJsonStore.m in Sources */,
 				F0A4106B1916E91C0046480F /* NTJsonColumn.m in Sources */,
 				F051E1FA18E29A8D008E0FFD /* AppDelegate.m in Sources */,
+				F0FD0DF61946013600E96BF6 /* NTJsonDictionary.m in Sources */,
 				F0A4106C1916E91C0046480F /* NTJsonObjectCache.m in Sources */,
 				F0A4106F1916E91C0046480F /* NTJsonIndex.m in Sources */,
 				F051E1F618E29A8D008E0FFD /* main.m in Sources */,
