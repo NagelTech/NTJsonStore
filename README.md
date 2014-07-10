@@ -3,6 +3,33 @@ NTJsonStore
 
 [In development] A No-SQL-like JSON data store, transparently leveraging SQLITE for storage and indexing.
 
+NTJsonStore is a NOSQL-style store that uses SQLITE to ultimately store the data and do indexing. It stores JSON natively and is schemaless. Because it uses SQLITE
+
+
+Quick Start
+===========
+
+ 
+
+
+
+
+Threading & Synchronization
+===========================
+
+`NTJsonStore` uses libdispatch for threading. Each collection maintains it's own serial queue for all operations. Operations may be performed synchronously with the calling thread or asynchrounously. For asynchrounous calls you may define a specific queue to run on. You may also force the completion handler to run on the internal queue for a collection by passing `NTJsonStoreSerialQueue` - this can be useful when coordinating multiple actions.
+
+Additionally, the `NTJsonStore` has synchronization methods that allow you to synchronize the queues across multiple collections.
+
+
+Query Strings
+=============
+
+
+
+
+
+
 
 To Do 1.0
 =========
@@ -12,6 +39,8 @@ To Do 1.0
  - documentation
 
  - sample application (freebase?)
+ 
+ - ? Store as plist ? (Cannot store NSNull)
 
 
 To Do Later Versions
@@ -24,7 +53,7 @@ To Do Later Versions
  - Optimized JSON format. Store JSON in a binary format that can be searched and deserialized very quickly.
    Take advantage of the fact we have a collection of similar items to maintain a master list of keys.
    
- - Cache query responses. cache Query responses (array of __rowid__'s) and avoid making unnecessary calls. Flush cache on insert/update/delete.
+ - Cache query responses. cache Query responses (array of `__rowid__`'s) and avoid making unnecessary calls. Flush cache on insert/update/delete.
  
  - Add simple local query support, integrated into query cache. Simple queries, such as get an object by a key can be handled without going to SQLIITE
    each time. (Load a hash of keys -> rowid's once then do a lookup.)
@@ -51,13 +80,11 @@ Don't Do
  
  - Transaction support causes lots of issues with caching and concurrency. It's probably not a good idea to complicate the codebase with it.
    If we did, here are some ideas:  - Transactions will be a block - return true to commit, false to rollback. They should work at the store level, across 
-   collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error; and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock; Caching would ither beread only or have
+   collections. -(BOOL)transaction:(BOOL (^)())transactionBlock error:(NSError **)error; and -(void)beginTransaction:(BOOL (^)())transactionBlock completionQueue:(dispatch_queue_t)completionQueue completionBlock:(void (^)(BOOL success, NSError *error))completionBlock; Caching would either be read only or have
    transaction support.
    
  - Support either an NSDictionary or NSArray as the root of a JSON object. We can't support array's as the root currently because we tore the rowid in the root
    of the object.
- 
-
 
 Done
 ====

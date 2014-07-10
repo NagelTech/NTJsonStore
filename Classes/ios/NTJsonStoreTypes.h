@@ -9,6 +9,7 @@
 
 #import <Foundation/Foundation.h>
 
+/// The internally generated Unique Identifier for any JsonCollection item
 typedef int64_t NTJsonRowId;
 
 extern NSString *NTJsonStoreErrorDomain;        // code = NTJsonStoreErrorCode
