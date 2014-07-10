@@ -25,7 +25,6 @@
 
 
 NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
-dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
 
 
 @implementation NTJsonStore

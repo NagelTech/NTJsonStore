@@ -12,8 +12,6 @@
 #import "NTJsonCollection.h"
 
 
-extern dispatch_queue_t NTJsonStoreSerialQueue;
-
 /// NTJsonStore is a container for a group of NTJsonCollections. It owns the underlying SQLITE store and has methods
 /// to assist in synchronizing operations across collections.
 @interface NTJsonStore : NSObject

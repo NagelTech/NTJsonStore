@@ -9,6 +9,10 @@
 
 #import <Foundation/Foundation.h>
 
+/// Special "Queue" constant which maps to the internal Collection or Store serial queue.
+extern dispatch_queue_t NTJsonStoreSerialQueue;
+
+
 /// The internally generated Unique Identifier for any JsonCollection item
 typedef int64_t NTJsonRowId;
 
