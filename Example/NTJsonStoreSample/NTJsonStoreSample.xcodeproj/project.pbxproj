@@ -16,6 +16,7 @@
 		F051E1FC18E29A8D008E0FFD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F051E1FB18E29A8D008E0FFD /* Images.xcassets */; };
 		F051E22018E33B13008E0FFD /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F051E21F18E33B13008E0FFD /* libsqlite3.dylib */; };
 		F051E23418E3AC8E008E0FFD /* ReceiverData.json in Resources */ = {isa = PBXBuildFile; fileRef = F051E23318E3AC8E008E0FFD /* ReceiverData.json */; };
+		F09D07A4196E125B0073ACCE /* NTJsonStoreTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = F09D07A3196E125B0073ACCE /* NTJsonStoreTypes.m */; };
 		F0A410671916E91C0046480F /* NTJsonCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410521916E91C0046480F /* NTJsonCollection.m */; };
 		F0A410681916E91C0046480F /* NTJsonSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410531916E91C0046480F /* NTJsonSqlConnection.m */; };
 		F0A410691916E91C0046480F /* NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410561916E91C0046480F /* NTJsonStore.m */; };
@@ -46,6 +47,7 @@
 		F051E20218E29A8D008E0FFD /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		F051E21F18E33B13008E0FFD /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		F051E23318E3AC8E008E0FFD /* ReceiverData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ReceiverData.json; sourceTree = "<group>"; };
+		F09D07A3196E125B0073ACCE /* NTJsonStoreTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonStoreTypes.m; sourceTree = "<group>"; };
 		F0A410521916E91C0046480F /* NTJsonCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonCollection.m; sourceTree = "<group>"; };
 		F0A410531916E91C0046480F /* NTJsonSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonSqlConnection.m; sourceTree = "<group>"; };
 		F0A410541916E91C0046480F /* NTJsonSqlConnection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonSqlConnection+Private.h"; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				F0A410561916E91C0046480F /* NTJsonStore.m */,
 				F0A410711916E9760046480F /* NTJsonStore.podspec */,
 				F0A410641916E91C0046480F /* NTJsonStoreTypes.h */,
+				F09D07A3196E125B0073ACCE /* NTJsonStoreTypes.m */,
 				F0A410701916E9760046480F /* README.md */,
 			);
 			name = NTJsonStore;
@@ -252,6 +255,7 @@
 				F051E1FA18E29A8D008E0FFD /* AppDelegate.m in Sources */,
 				F0FD0DF61946013600E96BF6 /* NTJsonDictionary.m in Sources */,
 				F0A4106C1916E91C0046480F /* NTJsonObjectCache.m in Sources */,
+				F09D07A4196E125B0073ACCE /* NTJsonStoreTypes.m in Sources */,
 				F0A4106F1916E91C0046480F /* NTJsonIndex.m in Sources */,
 				F051E1F618E29A8D008E0FFD /* main.m in Sources */,
 				F0A410671916E91C0046480F /* NTJsonCollection.m in Sources */,

@@ -172,7 +172,7 @@ static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
         
         NSMutableString *expSql = [NSMutableString stringWithString:sql];
         
-        int offset = 0;
+        NSInteger offset = 0;
         
         for(id arg in args)
         {
@@ -188,7 +188,7 @@ static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
                 value = [arg stringValue];
             
             else if ( [arg isKindOfClass:[NSData class]] )
-                value = [NSString stringWithFormat:@"[BLOB %d]", ((NSData *)arg).length];
+                value = [NSString stringWithFormat:@"[BLOB %d]", (int)((NSData *)arg).length];
             
             else
                 value = [NSString stringWithFormat:@"[%@]", NSStringFromClass([arg class])];
