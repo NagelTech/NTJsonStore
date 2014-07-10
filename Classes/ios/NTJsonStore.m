@@ -88,6 +88,24 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 }
 
 
+-(void)setStoreName:(NSString *)storeName
+{
+    if ( _connection )
+        @throw [NSException exceptionWithName:@"StoreOpen" reason:@"Cannot set storeName when store is already open." userInfo:nil];
+    
+    _storeName = storeName;
+}
+
+
+-(void)setStorePath:(NSString *)storePath
+{
+    if ( _connection )
+        @throw [NSException exceptionWithName:@"StoreOpen" reason:@"Cannot set storePath when store is already open." userInfo:nil];
+    
+    _storePath = storePath;
+}
+
+
 -(NSString *)storeFilename
 {
     return [self.storePath stringByAppendingPathComponent:self.storeName];

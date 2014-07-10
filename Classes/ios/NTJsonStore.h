@@ -16,11 +16,13 @@
 /// to assist in synchronizing operations across collections.
 @interface NTJsonStore : NSObject
 
-/// path to the JsonStore file, defaults to the Cache folder
-@property (nonatomic,readonly)      NSString *storePath;
+/// path to the JsonStore file, defaults to the Cache folder. This may be set until the first database access has been made, after that
+/// an exception will be thrown.
+@property (nonatomic,readwrite)      NSString *storePath;
 
-/// the filename of the JsonStore, defaults to NTJsonStore.db
-@property (nonatomic,readonly)      NSString *storeName;
+/// the filename of the JsonStore, defaults to NTJsonStore.db. This may be set until the first database access has been made, after that
+/// an exception will be thrown.
+@property (nonatomic,readwrite)      NSString *storeName;
 
 /// the full filename of the JsonStore file, storePath + storeName
 @property (nonatomic,readonly)      NSString *storeFilename;
