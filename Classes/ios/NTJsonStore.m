@@ -282,28 +282,39 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
     __block BOOL success = NO;
     
     [self.connection dispatchSync:^{
-        NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET [value] = ? WHERE [key] = ?;", NTJsonStore_MetadataTableName];
         
-        NSString *json = (value) ? [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:value options:0 error:nil] encoding:NSUTF8StringEncoding] : @"{}";
-        
-        if ( ![self.connection execSql:sql args:@[json, key]] )
+        if ( value ) // insert or update
         {
-            // Hmm, this is most likely to happen because the table doesn't exist, so let's make sure that's all set.
+            NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET [value] = ? WHERE [key] = ?;", NTJsonStore_MetadataTableName];
             
-            [self createMetadataTable];
+            NSString *json = (value) ? [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:value options:0 error:nil] encoding:NSUTF8StringEncoding] : @"{}";
             
-            success = NO; // now try an insert
+            if ( ![self.connection execSql:sql args:@[json, key]] )
+            {
+                // Hmm, this is most likely to happen because the table doesn't exist, so let's make sure that's all set.
+                
+                [self createMetadataTable];
+                
+                success = NO; // now try an insert
+            }
+            else
+            {
+                success = (sqlite3_changes(self.connection.db) == 1) ? YES : NO; // try insert if
+            }
+            
+            if ( !success )
+            {
+                sql = [NSString stringWithFormat:@"INSERT INTO [%@] ([key], [value]) VALUES (?, ?);", NTJsonStore_MetadataTableName];
+                
+                success = [self.connection execSql:sql args:@[key, json]];
+            }
         }
-        else
-        {
-            success = (sqlite3_changes(self.connection.db) == 1) ? YES : NO; // try insert if
-        }
         
-        if ( !success )
+        else // delete
         {
-            sql = [NSString stringWithFormat:@"INSERT INTO [%@] ([key], [value]) VALUES (?, ?);", NTJsonStore_MetadataTableName];
+            [self.connection execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [key] = ?;", NTJsonStore_MetadataTableName] args:@[key]];
             
-            success = [self.connection execSql:sql args:@[key, json]];
+            success = YES;  // pretty much always consider this successful
         }
         
         if ( !success )
