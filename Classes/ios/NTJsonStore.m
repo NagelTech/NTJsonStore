@@ -231,6 +231,89 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 }
 
 
+#pragma mark - metadata
+
+
+-(BOOL)createMetadataTable
+{
+    __block BOOL success;
+    
+    // NOTE: This is using the Store's queue, so it is serialized across all collections...
+    
+    [self.connection dispatchSync:^{
+        NSNumber *count = [self.connection execValueSql:@"SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?;" args:@[NTJsonStore_MetadataTableName]];
+        
+        if ( [count isKindOfClass:[NSNumber class]] && [count intValue] == 1 )
+        {
+            success = YES;
+            return  ;   // table already exists
+        }
+        
+        NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([key] TEXT, [value] BLOB);", NTJsonStore_MetadataTableName];
+        
+        success = [self.connection execSql:sql args:nil];
+        
+        if ( !success )
+            LOG_ERROR(@"Failed to create metadata table: %@", self.connection.lastError.localizedDescription);
+        
+        // we don't bother with an index on columnName
+    }];
+    
+    return success;
+}
+
+
+-(NSDictionary *)metadataWithKey:(NSString *)key
+{
+    __block NSDictionary *metadata = nil;
+    
+    [self.connection dispatchSync:^{
+        NSString *value = [self.connection execValueSql:[NSString stringWithFormat:@"SELECT [value] FROM [%@] WHERE [key] = ?", NTJsonStore_MetadataTableName] args:@[key]];
+        
+        metadata = (value) ? [NSJSONSerialization JSONObjectWithData:[value dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil] : nil;
+    }];
+    
+    return metadata;
+}
+
+
+-(BOOL)saveMetadataWithKey:(NSString *)key value:(NSDictionary *)value
+{
+    __block BOOL success = NO;
+    
+    [self.connection dispatchSync:^{
+        NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET [value] = ? WHERE [key] = ?;", NTJsonStore_MetadataTableName];
+        
+        NSString *json = (value) ? [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:value options:0 error:nil] encoding:NSUTF8StringEncoding] : @"{}";
+        
+        if ( ![self.connection execSql:sql args:@[json, key]] )
+        {
+            // Hmm, this is most likely to happen because the table doesn't exist, so let's make sure that's all set.
+            
+            [self createMetadataTable];
+            
+            success = NO; // now try an insert
+        }
+        else
+        {
+            success = (sqlite3_changes(self.connection.db) == 1) ? YES : NO; // try insert if
+        }
+        
+        if ( !success )
+        {
+            sql = [NSString stringWithFormat:@"INSERT INTO [%@] ([key], [value]) VALUES (?, ?);", NTJsonStore_MetadataTableName];
+            
+            success = [self.connection execSql:sql args:@[key, json]];
+        }
+        
+        if ( !success )
+            LOG_ERROR(@"Failed to update metadata for key %@: %@", key, self.connection.lastError.localizedDescription);
+    }];
+    
+    return success;
+}
+
+
 #pragma mark - ensureSchema
 
 

@@ -40,6 +40,9 @@
 /// Close the underlying store and any underlying collections. Once explicitly closed, the store instance cannot be re-opened.
 -(void)close;
 
+-(NSDictionary *)metadataWithKey:(NSString *)key;
+-(BOOL)saveMetadataWithKey:(NSString *)key value:(NSDictionary *)value;
+
 /// returns a collection with the indicated name. If the collection doesn't exist a new one will be created when it is first accessed.
 /// @param collectionName the name of the collection (collection names are not case sensitive.)
 /// @return a new or existing NTJsonCollection

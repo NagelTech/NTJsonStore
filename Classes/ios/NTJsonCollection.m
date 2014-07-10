@@ -32,7 +32,6 @@
 }
 
 @property (nonatomic,readonly) NTJsonSqlConnection *connection;
-@property (nonatomic,readonly) NSMutableDictionary *metadata;
 
 @end
 
@@ -226,7 +225,6 @@
         _indexes = nil;
         _objectCache = nil;
         _defaultJson = nil;
-        _metadata = nil;
         _pendingColumns = nil;
         _pendingIndexes = nil;
         
@@ -238,97 +236,13 @@
 }
 
 
-#pragma mark - metadata support
-
-
--(BOOL)createMetadataTable
-{
-    __block BOOL success;
-    
-    // NOTE: This is using the Store's queue, so it is serialized across all collections...
-    
-    [self.store.connection dispatchSync:^{
-        NSNumber *count = [self.store.connection execValueSql:@"SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?;" args:@[NTJsonStore_MetadataTableName]];
-        
-        if ( [count isKindOfClass:[NSNumber class]] && [count intValue] == 1 )
-        {
-            success = YES;
-            return  ;   // table already exists
-        }
-        
-        NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([collection] TEXT, [metadata] BLOB);", NTJsonStore_MetadataTableName];
-        
-        success = [self.store.connection execSql:sql args:nil];
-        
-        if ( !success )
-        {
-            _lastError = self.store.connection.lastError;
-            LOG_ERROR(@"Failed to create metadata table: %@", _lastError.localizedDescription);
-        }
-        
-        // we don't bother with an index on columnName
-    }];
-    
-    return success;
-}
-
-
--(NSMutableDictionary *)metadata
-{
-    [self.connection dispatchSync:^{
-        if ( !_metadata )
-        {
-            NSString *value = [self.connection execValueSql:[NSString stringWithFormat:@"SELECT [metadata] FROM [%@] WHERE [collection] = ?", NTJsonStore_MetadataTableName] args:@[self.name]];
-            
-            NSDictionary *json = (value) ? [NSJSONSerialization JSONObjectWithData:[value dataUsingEncoding:NSUTF8StringEncoding] options:0 error:nil] : nil;
-            
-            _metadata = (json) ? [json mutableCopy] : [NSMutableDictionary dictionary];
-        }
-    }];
-
-    return _metadata;
-}
-
-
--(BOOL)_saveMetadata
-{
-    BOOL success;
-    
-    NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET [metadata] = ? WHERE [collection] = ?;", NTJsonStore_MetadataTableName];
-    
-    NSString *json = (_metadata) ? [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:_metadata options:0 error:nil] encoding:NSUTF8StringEncoding] : @"{}";
-    
-    if ( ![self.connection execSql:sql args:@[json, self.name]] )
-    {
-        // Hmm, this is most likely to happen because the table doesn't exist, so let's make sure that's all set.
-        
-        [self createMetadataTable];
-        
-        success = NO; // now try an insert
-    }
-    else
-    {
-        success = (sqlite3_changes(self.connection.db) == 1) ? YES : NO; // try insert if
-    }
-
-    if ( !success )
-    {
-        sql = [NSString stringWithFormat:@"INSERT INTO [%@] ([collection], [metadata]) VALUES (?, ?);", NTJsonStore_MetadataTableName];
-        
-        success = [self.connection execSql:sql args:@[self.name, json]];
-    }
-    
-    if ( !success )
-    {
-        _lastError = self.connection.lastError;
-        LOG_ERROR(@"Failed to update metadata for collection %@: %@", self.name, _lastError.localizedDescription);
-    }
-    
-    return success;
-}
-
-
 #pragma mark - defaultJson
+
+
+-(NSString *)defaultJsonMetadataKey
+{
+    return [NSString stringWithFormat:@"%@/defaultJson", self.name];
+}
 
 
 -(NSDictionary *)defaultJson
@@ -338,7 +252,7 @@
     [self.connection dispatchSync:^{
         if ( !_defaultJson )
         {
-            _defaultJson = self.metadata[@"defaultJson"] ?: [NSDictionary dictionary];
+            _defaultJson = [self.store metadataWithKey:[self defaultJsonMetadataKey]] ?: [NSDictionary dictionary];
         }
         
         defaultJson = _defaultJson;
@@ -405,11 +319,10 @@
         // Update our internal variables...
         
         _defaultJson = [defaultJson copy];
-        self.metadata[@"defaultJson"] = _defaultJson;
-
-        // save our metadata...
         
-        [self _saveMetadata];
+        // save our metadata...
+
+        [self.store saveMetadataWithKey:[self defaultJsonMetadataKey] value:_defaultJson];
     }];
 }
 
