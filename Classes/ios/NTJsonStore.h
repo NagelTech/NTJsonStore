@@ -37,6 +37,10 @@
 -(id)initWithName:(NSString *)storeName;
 -(id)initWithPath:(NSString *)storePath name:(NSString *)storeName;
 
++(NSDictionary *)loadConfigFile:(NSString *)filename;
+-(void)applyConfig:(NSDictionary *)config;
+-(BOOL)applyConfigFile:(NSString *)filename;
+
 /// Close the underlying store and any underlying collections. Once explicitly closed, the store instance cannot be re-opened.
 -(void)close;
 

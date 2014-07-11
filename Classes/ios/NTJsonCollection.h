@@ -43,6 +43,9 @@
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 -(void)addQueryableFields:(NSString *)fields;
 
+-(void)applyConfig:(NSDictionary *)config;
+-(BOOL)applyConfigFile:(NSString *)filename;
+
 -(void)flushCache;
 
 /// ensure all pending schema changes this collection have been committed to the data store. Changes to indexes, queryable fields and

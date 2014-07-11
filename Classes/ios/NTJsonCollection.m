@@ -201,6 +201,82 @@
 }
 
 
+#pragma mark - config
+
+
+-(void)applyConfig:(NSDictionary *)config
+{
+    NSNumber *cacheSize = config[@"cacheSize"];
+    NSDictionary *defaultJson = config[@"defaultJson"];
+    NSArray *indexes = config[@"indexes"];
+    NSArray *uniqueIndexes = config[@"uniqueIndexes"];
+    NSArray *queryableFields = config[@"queryableFields"];
+    
+    if ( [cacheSize isKindOfClass:[NSNumber class]] )
+    {
+        self.cacheSize = [cacheSize intValue];
+    }
+    
+    if ( [defaultJson isKindOfClass:[NSDictionary class]] )
+    {
+        self.defaultJson = defaultJson;
+    }
+    
+    // We allow either a single string or an array of strings for indexes, uniqueIndexes and queryableFields. detect single string case
+    // and wrap them in an array to make things consistent...
+    
+    if ( [indexes isKindOfClass:[NSString class]] )
+        indexes = @[indexes];
+    
+    if( [uniqueIndexes isKindOfClass:[NSString class]] )
+        uniqueIndexes = @[uniqueIndexes];
+    
+    if ( [queryableFields isKindOfClass:[NSString class]] )
+        queryableFields = @[queryableFields];
+    
+    if ( [indexes isKindOfClass:[NSArray class]] )
+    {
+        for (NSString *index in indexes)
+        {
+            if ( [index isKindOfClass:[NSString class]] )
+                [self addIndexWithKeys:index];
+        }
+    }
+    
+    if ( [uniqueIndexes isKindOfClass:[NSArray class]] )
+    {
+        for (NSString *uniqueIndex in uniqueIndexes)
+        {
+            if ( [uniqueIndex isKindOfClass:[NSString class]] )
+                [self addUniqueIndexWithKeys:uniqueIndex];
+        }
+    }
+    
+    if ( [queryableFields isKindOfClass:[NSArray class]] )
+    {
+        for (NSString *queryableField in queryableFields)
+        {
+            if ( [queryableField isKindOfClass:[NSString class]] )
+                [self addQueryableFields:queryableField];
+        }
+
+    }
+}
+
+
+-(BOOL)applyConfigFile:(NSString *)filename
+{
+    NSDictionary *config = [self.class loadConfigFile:filename];
+    
+    if ( !config )
+        return NO;
+    
+    [self applyConfig:config];
+    
+    return YES;
+}
+
+
 #pragma mark - close
 
 

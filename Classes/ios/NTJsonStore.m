@@ -325,6 +325,93 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 }
 
 
+
+#pragma mark - config
+
+
++(NSDictionary *)loadConfigFile:(NSString *)filename
+{
+    NSString *path;
+    
+    if ( [filename pathComponents].count > 1 )
+        path = filename;    // it's already a path
+    
+    else // otherwise find a resource in the bundle
+    {
+        NSString *type = [filename pathExtension];
+        NSString *resource = [filename stringByDeletingPathExtension];
+        
+        path = [[NSBundle mainBundle] pathForResource:resource ofType:type];
+    }
+    
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    
+    if ( !data )
+        return nil;
+    
+    return [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+}
+
+
+-(void)applyConfig:(NSDictionary *)config
+{
+    if ( ![config isKindOfClass:[NSDictionary class]] )
+        return ;
+    
+    NSString *storePath = config[@"storePath"];
+    NSString *storeName = config[@"storeName"];
+    NSDictionary *collections = config[@"collections"];
+    
+    if ( [storePath isKindOfClass:[NSString class]] && storePath.length )
+    {
+        if ( [storePath isEqualToString:@"CACHES"] )
+            storePath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+        
+        else if ( [storePath isEqualToString:@"TEMP"] )
+            storePath = NSTemporaryDirectory();
+        
+        else if ( [storePath isEqualToString:@"DOCS"] )
+            storePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+        
+        self.storePath = storePath;
+    }
+    
+    if ( [storeName isKindOfClass:[NSString class]] && storeName.length )
+    {
+        self.storeName = storeName;
+    }
+    
+    if ( [collections isKindOfClass:[NSDictionary class]] )
+    {
+        for(NSString *collectionName in collections.allKeys)
+        {
+            NSDictionary *collectionConfig = collections[collectionName];
+            
+            if ( [collectionConfig isKindOfClass:[NSDictionary class]] )
+            {
+                NTJsonCollection *collection = [self collectionWithName:collectionName];
+                
+                [collection applyConfig:collectionConfig];
+            }
+            
+        }
+    }
+}
+
+
+-(BOOL)applyConfigFile:(NSString *)filename
+{
+    NSDictionary *config = [self.class loadConfigFile:filename];
+    
+    if ( !config )
+        return NO;
+    
+    [self applyConfig:config];
+    
+    return YES;
+}
+
+
 #pragma mark - ensureSchema
 
 
