@@ -393,7 +393,6 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
                 
                 [collection applyConfig:collectionConfig];
             }
-            
         }
     }
 }
@@ -401,7 +400,7 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 
 -(BOOL)applyConfigFile:(NSString *)filename
 {
-    NSDictionary *config = [self.class loadConfigFile:filename];
+    NSDictionary *config = [NTJsonStore loadConfigFile:filename];
     
     if ( !config )
         return NO;

@@ -266,7 +266,7 @@
 
 -(BOOL)applyConfigFile:(NSString *)filename
 {
-    NSDictionary *config = [self.class loadConfigFile:filename];
+    NSDictionary *config = [NTJsonStore loadConfigFile:filename];
     
     if ( !config )
         return NO;
