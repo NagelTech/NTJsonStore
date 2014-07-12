@@ -344,12 +344,21 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
         path = [[NSBundle mainBundle] pathForResource:resource ofType:type];
     }
     
+    if ( !path )
+        return nil;
+    
     NSData *data = [NSData dataWithContentsOfFile:path];
     
     if ( !data )
         return nil;
     
-    return [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    NSError *error;
+    NSDictionary *config = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+    
+    if ( !config )
+        LOG_ERROR(@"Error parsing config file: %@", error);
+    
+    return config;
 }
 
 

@@ -215,6 +215,7 @@ static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
     
     if (status != SQLITE_OK )
     {
+        _lastError = [NSError NSJsonStore_errorWithSqlite3:_db];
         LOG_ERROR(@"Failed to prepare statement %@ - %@", sql, _lastError.localizedDescription);
         return NULL;
     }
