@@ -14,10 +14,10 @@
 
 @interface NSError (NTJsonStorePrivate)
 
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode;
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode message:(NSString *)message;
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode format:(NSString *)format, ...;
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode;
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode message:(NSString *)message;
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode format:(NSString *)format, ...;
 
-+(instancetype)NSJsonStore_errorWithSqlite3:(sqlite3 *)db;
++(instancetype)NTJsonStore_errorWithSqlite3:(sqlite3 *)db;
 
 @end

@@ -32,30 +32,30 @@ static NSString *descriptionForCode(NTJsonStoreErrorCode code)
 }
 
 
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode message:(NSString *)message
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode message:(NSString *)message
 {
     return [[NSError alloc] initWithDomain:NTJsonStoreErrorDomain code:errorCode userInfo:@{NSLocalizedDescriptionKey: message}];
 }
 
 
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode
 {
-    return [self NSJsonStore_errorWithCode:errorCode message:descriptionForCode(errorCode)];
+    return [self NTJsonStore_errorWithCode:errorCode message:descriptionForCode(errorCode)];
 }
 
 
-+(instancetype)NSJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode format:(NSString *)format, ...
++(instancetype)NTJsonStore_errorWithCode:(NTJsonStoreErrorCode)errorCode format:(NSString *)format, ...
 {
     va_list args;
     va_start(args, format);
     NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
     va_end(args);
     
-    return [self NSJsonStore_errorWithCode:errorCode message:message];
+    return [self NTJsonStore_errorWithCode:errorCode message:message];
 }
 
 
-+(instancetype)NSJsonStore_errorWithSqlite3:(sqlite3 *)db
++(instancetype)NTJsonStore_errorWithSqlite3:(sqlite3 *)db
 {
     int errcode = sqlite3_errcode(db);
     NSString *errmsg = [[NSString alloc] initWithCString:sqlite3_errmsg(db) encoding:NSUTF8StringEncoding];

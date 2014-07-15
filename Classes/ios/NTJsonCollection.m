@@ -154,7 +154,7 @@
 {
     if ( _isClosed || _isClosing )
     {
-        _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorClosed];
+        _lastError = [NSError NTJsonStore_errorWithCode:NTJsonStoreErrorClosed];
         return NO;
     }
     
@@ -162,7 +162,7 @@
     {
         // The store has been deallocated and things are now a mess.
         
-        _lastError = [NSError NSJsonStore_errorWithCode:NTJsonStoreErrorClosed];
+        _lastError = [NSError NTJsonStore_errorWithCode:NTJsonStoreErrorClosed];
         return NO;
     }
     
@@ -1326,7 +1326,7 @@
     
     if ( status != SQLITE_DONE )
     {
-        _lastError = [NSError NSJsonStore_errorWithSqlite3:self.connection.db];
+        _lastError = [NSError NTJsonStore_errorWithSqlite3:self.connection.db];
         items = nil; // failure
     }
     
