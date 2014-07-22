@@ -419,9 +419,9 @@
     _columns = [NSArray array];
     _indexes = [NSArray array];
     
-    if ( ![self.connection execSql:sql args:nil] )
+    if ( ![self.store.connection execSql:sql args:nil] )
     {
-        _lastError = self.connection.lastError;
+        _lastError = self.store.connection.lastError;
         return NO;
     }
     
@@ -454,9 +454,9 @@
 
         NSString *alterSql = [NSString stringWithFormat:@"ALTER TABLE [%@] ADD COLUMN [%@];", self.name, column.name];
         
-        if ( ![self.connection execSql:alterSql args:nil] )
+        if ( ![self.store.connection execSql:alterSql args:nil] )
         {
-            _lastError = self.connection.lastError;
+            _lastError = self.store.connection.lastError;
             LOG_ERROR(@"Failed to add column %@.%@ - %@", self.name, column.name, _lastError.localizedDescription);
             return NO;  // oops
         }
@@ -464,11 +464,11 @@
     
     // Now we need to populate the data...
     
-    sqlite3_stmt *selectStatement = [self.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
+    sqlite3_stmt *selectStatement = [self.store.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
     
     if ( !selectStatement )
     {
-        _lastError = self.connection.lastError;
+        _lastError = self.store.connection.lastError;
         return NO;  // todo: cleanup here somehow? transaction?
     }
     
@@ -504,11 +504,11 @@
         
         // Perform our update...
         
-        BOOL success = [self.connection execSql:updateSql args:values];
+        BOOL success = [self.store.connection execSql:updateSql args:values];
         
         if ( !success )
         {
-            LOG_ERROR(@"sql update failed for %@:%d - %@", self.name, rowid, self.connection.lastError.localizedDescription);
+            LOG_ERROR(@"sql update failed for %@:%d - %@", self.name, rowid, self.store.connection.lastError.localizedDescription);
             // continue on here, do our best.
         }
     }
@@ -534,9 +534,9 @@
     {
         LOG_DBG(@"Adding index: %@.%@ (%@)", self.name, index.name, index.keys);
         
-        if ( ![self.connection execSql:[index sqlWithTableName:self.name] args:nil])
+        if ( ![self.store.connection execSql:[index sqlWithTableName:self.name] args:nil])
         {
-            _lastError = self.connection.lastError;
+            _lastError = self.store.connection.lastError;
             LOG_ERROR(@"Failed to create index: %@.%@ (%@) - %@", self.name, index.name, index.keys, _lastError.localizedDescription);
             return NO;
         }
@@ -572,7 +572,7 @@
 {
     completionQueue = [self getCompletionQueue:completionQueue];
     
-    [self.connection dispatchAsync:^{
+    [self.store.connection dispatchAsync:^{
         BOOL success = [self _ensureSchema];
         NSError *error = (success) ? nil : _lastError;
         
@@ -593,7 +593,7 @@
 {
     __block BOOL success;
     
-    [self.connection dispatchSync:^{
+    [self.store.connection dispatchSync:^{
         success = [self _ensureSchema];
     }];
     
