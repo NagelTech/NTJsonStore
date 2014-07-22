@@ -419,13 +419,17 @@
     _columns = [NSArray array];
     _indexes = [NSArray array];
     
-    if ( ![self.store.connection execSql:sql args:nil] )
-    {
-        _lastError = self.store.connection.lastError;
-        return NO;
-    }
+    __block BOOL success = YES;
     
-    return YES;
+    [self.store.connection dispatchSync:^{
+        if ( ![self.store.connection execSql:sql args:nil] )
+        {
+            _lastError = self.store.connection.lastError;
+            success = NO;
+        }
+    }];
+    
+    return success;
 }
 
 
@@ -454,21 +458,28 @@
 
         NSString *alterSql = [NSString stringWithFormat:@"ALTER TABLE [%@] ADD COLUMN [%@];", self.name, column.name];
         
-        if ( ![self.store.connection execSql:alterSql args:nil] )
-        {
-            _lastError = self.store.connection.lastError;
-            LOG_ERROR(@"Failed to add column %@.%@ - %@", self.name, column.name, _lastError.localizedDescription);
-            return NO;  // oops
-        }
+        __block BOOL success = YES;
+        
+        [self.store.connection dispatchSync:^{
+            if ( ![self.store.connection execSql:alterSql args:nil] )
+            {
+                _lastError = self.store.connection.lastError;
+                LOG_ERROR(@"Failed to add column %@.%@ - %@", self.name, column.name, _lastError.localizedDescription);
+                success = NO;
+            }
+        }];
+        
+        if ( !success )
+            return NO;
     }
     
     // Now we need to populate the data...
     
-    sqlite3_stmt *selectStatement = [self.store.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
+    sqlite3_stmt *selectStatement = [self.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
     
     if ( !selectStatement )
     {
-        _lastError = self.store.connection.lastError;
+        _lastError = self.connection.lastError;
         return NO;  // todo: cleanup here somehow? transaction?
     }
     
@@ -504,11 +515,11 @@
         
         // Perform our update...
         
-        BOOL success = [self.store.connection execSql:updateSql args:values];
+        BOOL success = [self.connection execSql:updateSql args:values];
         
         if ( !success )
         {
-            LOG_ERROR(@"sql update failed for %@:%d - %@", self.name, rowid, self.store.connection.lastError.localizedDescription);
+            LOG_ERROR(@"sql update failed for %@:%d - %@", self.name, rowid, self.connection.lastError.localizedDescription);
             // continue on here, do our best.
         }
     }
@@ -534,12 +545,18 @@
     {
         LOG_DBG(@"Adding index: %@.%@ (%@)", self.name, index.name, index.keys);
         
-        if ( ![self.store.connection execSql:[index sqlWithTableName:self.name] args:nil])
-        {
-            _lastError = self.store.connection.lastError;
-            LOG_ERROR(@"Failed to create index: %@.%@ (%@) - %@", self.name, index.name, index.keys, _lastError.localizedDescription);
+        __block BOOL success = YES;
+        [self.store.connection dispatchSync:^{
+            if ( ![self.store.connection execSql:[index sqlWithTableName:self.name] args:nil])
+            {
+                _lastError = self.store.connection.lastError;
+                LOG_ERROR(@"Failed to create index: %@.%@ (%@) - %@", self.name, index.name, index.keys, _lastError.localizedDescription);
+                success = NO;
+            }
+        }];
+        
+        if ( !success )
             return NO;
-        }
     }
     
     _indexes = [self.indexes arrayByAddingObjectsFromArray:_pendingIndexes];
@@ -558,34 +575,18 @@
     if ( !_isNewCollection
         && !_pendingColumns.count
         && !_pendingIndexes.count )
-        return YES; // no schema changes, we can move on..
+        return YES; // no schema changes, so we can just return
     
-    // These changes need to happen on the store connection so we don't make multiple schema changes concurrently...
+    if ( ![self schema_createCollection] )
+        return NO;
     
-    __block BOOL success = YES;
+    if ( ![self schema_addOrUpdatePendingColumns] )
+        return NO;
     
-    [self.store.connection dispatchSync:^{
-        
-        if ( ![self schema_createCollection] )
-        {
-            success = NO;
-            return ;
-        }
-        
-        if ( ![self schema_addOrUpdatePendingColumns] )
-        {
-            success =  NO;
-            return ;
-        }
-        
-        if ( ![self schema_addPendingIndexes] )
-        {
-            success = NO;
-            return ;
-        }
-    }];
+    if ( ![self schema_addPendingIndexes] )
+        return NO;
     
-    return success;
+    return YES;
 }
 
 
@@ -593,7 +594,7 @@
 {
     completionQueue = [self getCompletionQueue:completionQueue];
     
-    [self.store.connection dispatchAsync:^{
+    [self.connection dispatchAsync:^{
         BOOL success = [self _ensureSchema];
         NSError *error = (success) ? nil : _lastError;
         
@@ -614,7 +615,7 @@
 {
     __block BOOL success;
     
-    [self.store.connection dispatchSync:^{
+    [self.connection dispatchSync:^{
         success = [self _ensureSchema];
     }];
     
