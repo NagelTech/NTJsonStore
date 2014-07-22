@@ -555,16 +555,37 @@
     if ( ![self validateEnvironment] )
         return NO;
     
-    if ( ![self schema_createCollection] )
-        return NO;
+    if ( !_isNewCollection
+        && !_pendingColumns.count
+        && !_pendingIndexes.count )
+        return YES; // no schema changes, we can move on..
     
-    if ( ![self schema_addOrUpdatePendingColumns] )
-        return NO;
+    // These changes need to happen on the store connection so we don't make multiple schema changes concurrently...
     
-    if ( ![self schema_addPendingIndexes] )
-        return NO;
+    __block BOOL success = YES;
     
-    return YES;
+    [self.store.connection dispatchSync:^{
+        
+        if ( ![self schema_createCollection] )
+        {
+            success = NO;
+            return ;
+        }
+        
+        if ( ![self schema_addOrUpdatePendingColumns] )
+        {
+            success =  NO;
+            return ;
+        }
+        
+        if ( ![self schema_addPendingIndexes] )
+        {
+            success = NO;
+            return ;
+        }
+    }];
+    
+    return success;
 }
 
 
