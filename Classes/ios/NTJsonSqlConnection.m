@@ -324,9 +324,12 @@ static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
     
     if ( status != SQLITE_ROW )
     {
-        _lastError = [NSError NTJsonStore_errorWithSqlite3:self.db];
-        
-        LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
+        if ( status != SQLITE_DONE )
+        {
+            _lastError = [NSError NTJsonStore_errorWithSqlite3:self.db];
+            
+            LOG_ERROR(@"Failed to execute statement - %@", _lastError.localizedDescription);
+        }
         
         sqlite3_finalize(statement);
         
