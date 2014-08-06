@@ -13,6 +13,9 @@
 static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
 
 
+#define BUSY_TIMEOUT_MS 1000        // 1 second as a default for now. This should probably be made configurable?
+
+
 @interface NTJsonSqlConnection ()
 {
     sqlite3 *_db; // nil = auto open, other = connection, CONNECTION_CLOSED = closed or failed to open
@@ -127,6 +130,8 @@ static sqlite3 *CONNECTION_CLOSED = (sqlite3 *)(void *)1;
         }
         
         LOG_SQL(@"Database opened, location %@", self.filename);
+        
+        sqlite3_busy_timeout(_db, BUSY_TIMEOUT_MS);
         
         if ( newDatabase )
         {
