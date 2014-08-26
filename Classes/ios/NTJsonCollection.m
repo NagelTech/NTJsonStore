@@ -414,7 +414,7 @@
     LOG_DBG(@"Adding table: %@", self.name);
     
     _isNewCollection = NO;
-    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([__rowid__] INTEGER PRIMARY KEY AUTOINCREMENT, [__json__] BLOB);", self.name];
+    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE [%@] ([%@] INTEGER PRIMARY KEY AUTOINCREMENT, [__json__] BLOB);", self.name, NTJsonRowIdKey];
     
     _columns = [NSArray array];
     _indexes = [NSArray array];
@@ -475,7 +475,7 @@
     
     // Now we need to populate the data...
     
-    sqlite3_stmt *selectStatement = [self.connection statementWithSql:[NSString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM [%@]", self.name] args:nil];
+    sqlite3_stmt *selectStatement = [self.connection statementWithSql:[NSString stringWithFormat:@"SELECT [%@], [__json__] FROM [%@]", NTJsonRowIdKey, self.name] args:nil];
     
     if ( !selectStatement )
     {
@@ -483,9 +483,10 @@
         return NO;  // todo: cleanup here somehow? transaction?
     }
     
-    NSString *updateSql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [__rowid__] = ?;", self.name, [[_pendingColumns NTJsonStore_transform:^id(NTJsonColumn *column) {
-        return [NSString stringWithFormat:@"[%@] = ?", column.name];
-    }] componentsJoinedByString:@", "]];
+    NSString *updateSql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [%@] = ?;",
+                           self.name,
+                           [[_pendingColumns NTJsonStore_transform:^id(NTJsonColumn *column) { return [NSString stringWithFormat:@"[%@] = ?", column.name]; }] componentsJoinedByString:@", "],
+                           NTJsonRowIdKey];
     int status;
     
     while ( (status=sqlite3_step(selectStatement)) == SQLITE_ROW )
@@ -663,7 +664,7 @@
                 {
                     NSString *columnName = [NSString stringWithUTF8String:(const char *)sqlite3_column_text(statement, 1)];
                     
-                    if ( [columnName isEqualToString:@"__rowid__"] || [columnName isEqualToString:@"__json__"] )
+                    if ( [columnName isEqualToString:NTJsonRowIdKey] || [columnName isEqualToString:@"__json__"] )
                         continue;
                     
                     [columns addObject:[NTJsonColumn columnWithName:columnName]];
@@ -726,7 +727,7 @@
         
         // Ignore our row id, it's always available...
         
-        if ( [columnName isEqualToString:@"__rowid__"] )
+        if ( [columnName isEqualToString:NTJsonRowIdKey] )
             return ;
         
         // check existing column list...
@@ -1050,14 +1051,15 @@
     if ( ![self _ensureSchema] )
         return NO;
     
-    NTJsonRowId rowid = [json[@"__rowid__"] longLongValue];
+    NTJsonRowId rowid = [json[NTJsonRowIdKey] longLongValue];
     
     NSMutableArray *columnNames = [NSMutableArray arrayWithObject:@"__json__"];
     [columnNames addObjectsFromArray:[self.columns NTJsonStore_transform:^id(NTJsonColumn *column) { return column.name; }]];
     
-    NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [__rowid__] = ?;",
+    NSString *sql = [NSString stringWithFormat:@"UPDATE [%@] SET %@ WHERE [%@] = ?;",
                      self.name,
-                     [[columnNames NTJsonStore_transform:^id(NSString *columnName) { return [NSString stringWithFormat:@"[%@] = ?", columnName]; }] componentsJoinedByString:@", "]];
+                     [[columnNames NTJsonStore_transform:^id(NSString *columnName) { return [NSString stringWithFormat:@"[%@] = ?", columnName]; }] componentsJoinedByString:@", "],
+                     NTJsonRowIdKey];
     
     NSMutableArray *values = [NSMutableArray array];
     
@@ -1135,9 +1137,9 @@
     if( ![self _ensureSchema] )
         return NO;
     
-    long long rowid = [json[@"__rowid__"] longLongValue];
+    long long rowid = [json[NTJsonRowIdKey] longLongValue];
 
-    BOOL success = [self.connection execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [__rowid__] = ?", self.name] args:@[@(rowid)]];
+    BOOL success = [self.connection execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [%@] = ?", self.name, NTJsonRowIdKey] args:@[@(rowid)]];
     
     if ( success )
         [_objectCache removeObjectWithRowId:rowid];
@@ -1287,7 +1289,7 @@
     
     // Ok, now we can actually do the query...
     
-    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT [__rowid__], [__json__] FROM %@", self.name];
+    NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT [%@], [__json__] FROM %@", NTJsonRowIdKey, self.name];
     
     if ( where )
         [sql appendFormat:@" WHERE %@", where];
@@ -1333,10 +1335,10 @@
             
             // Make sure __rowid__ is valid and correct.
             
-            if (  ![rawJson[@"__rowId__"] isEqualToNumber:@(rowid)] )
+            if (  ![rawJson[NTJsonRowIdKey] isEqualToNumber:@(rowid)] )
             {
                 NSMutableDictionary *mutableJson = [rawJson mutableCopy];
-                mutableJson[@"__rowid__"] = @(rowid);
+                mutableJson[NTJsonRowIdKey] = @(rowid);
                 rawJson = [mutableJson copy];
             }
             

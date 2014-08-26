@@ -10,3 +10,5 @@
 
 
 dispatch_queue_t NTJsonStoreSerialQueue = (id)@"NTJsonStoreSerialQueue";
+
+NSString * const NTJsonRowIdKey = @"__rowid__";

@@ -12,6 +12,11 @@
 /// Special "Queue" constant which maps to the internal Collection or Store serial queue.
 extern dispatch_queue_t NTJsonStoreSerialQueue;
 
+/**
+ *  the key name of the row id in the JSON.
+ */
+extern NSString * const NTJsonRowIdKey;
+
 
 /// The internally generated Unique Identifier for any JsonCollection item
 typedef int64_t NTJsonRowId;
