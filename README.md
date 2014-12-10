@@ -1,17 +1,46 @@
-NTJsonStore
-===========
+# NTJsonStore
+NTJsonStore is a NOSQL-style store that uses SQLITE to ultimately store the data and do indexing. It stores JSON natively and is schemaless. Because it uses SQLITE we get fast indexes and a flexible query language (SQL WHERE clauses.)
 
-[In development] A No-SQL-like JSON data store, transparently leveraging SQLITE for storage and indexing.
+## Overview
 
-NTJsonStore is a NOSQL-style store that uses SQLITE to ultimately store the data and do indexing. It stores JSON natively and is schemaless. Because it uses SQLITE we get fast indexes and a flexible query language (SQL where clauses.)
+The `NTJsonStore` is a container for a group of `NTJsonCollections`. It owns the underlying SQLITE store and has methods to assist in synchronizing operations across collections. Each store has a global key-value collection of metadata which can b used to store aditional data about the store or collections. Collections are created as they are first accessed, so there is no explicit process to create a collection.
 
+Each collection is represented by a `NTJsonCollection` object which is responsible for all access to an individual collection. Colletions are created when they are first accessed and are schema-less.
 
-Quick Start
-===========
+## Configuration
+
+The Store encapsulates the database and allows access to the array of collections. The `storePath` defaults to the caches directory and the `storeName	 defaults to 'NTJsonStore.db'. These properties can be change any time before the store is first accessed.
+
+There are several configuration settings for each collection:
+    
+ - **Indexes.** The system supports both unique an non-unique indexes. Add a unique index with `-addUni ueIndexWithKeys` or a non-uniue index with `-addIndexWithKeys:`. In both cases the "keys" is a single string with a comma-separated list of fields to be indexed. Each field *must* be enclosed in square braces. Additionally you may append `DESC` or `ASC` to any field to define the sort order.
+
+  - **Queryable Fields.** Queryable fields tells the systems the fields you plan on using. If you make this call when the collection is empty it is very low cost. (Once there are records the system will extract the field from each JSON record and create columns for you.) The `-addQueryableFields:` message accepts a comma-separated list of field names, *each enclosed in square braces*. This call is totally optional and is used to improve performance -- if you use a field that has not been materialized the system will do transparently for you.
+
+ - **Default JSON.** The defauls JSON defines default values for fields when performing queries. 
+ 
+ - **Cache Size.** The system caches JSON results for you to minimize the overhead of parsing the JSON our of the data store as well as to reduce your memory footprint (by returning the same `NSDictionary` each time it is requested.) By default the system will track objects that are in use by your application (using some reference counting magic) and will cache up to 0 additional items. `setCacheSize:` is used to change the default, setting it to 0 will only track in use items while -1 will disable all caching so a new object is returned each time. Any other value inidcates the cache size. You can also flush the cache by calling `-flushCache`
+
+These values are persisted between starts of the app (except for cache size which should be set on start-up.) It is recommended you set them on each start of the application, so any changes ( due to an upgrade, for instance), will be immediately reflected. Setting these values when when they are already in effect has no effect.
+
+In addition to coniguring the values manually  by calling the methods above, items can be configured by passing a JSON configuration to `-applyJson:'.
+
 
  
+Query Strings
+=============
 
+ - In general, anything valid in a SQLITE WHERE clause is valid in a query string.
+- All JSON values must be enclosed in square braces. Nested JSON values are allowed using "." notation.
+ - Cross-table queries are ~not~ allowed.
+ - The store automatically  maintains columns for you in SQL to perform the queries. The first time a new field is used the column must be "materialized" - if the collection is large this can cause a performance impact.
+ - You can tell the system which columns you plan on accessing by setting the "QuerableFields" either in the config or by calling the method. This will materialize any missing columns immediately.
+ - Any other time you reference columns, such as in an order by clause, defining indexes or queryable fields, square braces are required enclosing the field names.
 
+`NTJsonRowId`
+===========
+
+Each record returned from NTJsonStore has a row id that is guaranteed to be unique per collection. (This id increments for each new record and is not re-used.) This is returned as "__rowid__" (`NTjsonRowIdKey`)
 
 
 Threading & Synchronization
@@ -22,31 +51,45 @@ Threading & Synchronization
 Additionally, the `NTJsonStore` has synchronization methods that allow you to synchronize the queues across multiple collections.
 
 
-Query Strings
-=============
+Default JSON
+============
+
+ - default values for any fields in JSON
+ - used as a default in queries when the field is not present in the JSON.
 
 
+Caching
+=======
 
-
-
+ - LRU cache
+ - set cache size, default is 40 records
+ - set cache to 0 to only track used JSON objects
+ - sett cache to -1 to disable all caching, including tracking of used JSON objects.
 
 
 To Do 1.0
 =========
 
- - tests
- 
  - documentation
 
  - sample application (freebase?)
- 
- - ? Store as plist ? (Cannot store NSNull)
- 
- - Allow schema configuration (indexes, etc) with JSON.
+
+ - ensure thread safety when deallocing NTJsonDictionary instances
+
+ - General thread safety clean-up (flushCache for instance is not protected.)
+
+ - Consider removing NTJsonDictionary all together in favor of plain vanilla NSDictionaries. (May impact cache performance.)
+
+ - Investgate multi-process access to Stores (iOS 8 extensions.) Do we need to use (or enable) a NSFileCoordinator to manage the cache? Does SQLITE work multi-process already? Can we add a presenter for the existing sqlite file? Maybe not? http://www.atomicbird.com/blog/sharing-with-app-extensions
+
 
 
 To Do Later Versions
 ====================
+
+- Allow returned items to be model objects, conforming to a protocol `NTJsonStorable`. Configuration value to set the "model" class for a collection which would be returned instead of the NSDictionary. NTJsonStorable objects are expected to (1) be immutable and (2) implement initWithJson: and (3) implement asJson which should return the original JSON. This task is easier if we remove support for used cach entry detection (NTJsonDictionary), otherwise we will need to create a proxy wrapper for this class.
+
+ - Consider a SQLite database per collection. May impact performance or memory significantly but would allow concurrent writes on multiple collections (which SQLITE doesn't actully support)
 
  - maintain count in memory when we know it.
  
@@ -66,7 +109,7 @@ To Do Later Versions
  
  - Add notifications when collections or objects are modified. This also enables caching.
  
- - Add notifications when query results are changed. (This becomes possible with robus query caching.)
+ - Add notifications when query results are changed. (This becomes possible with robust query caching.)
 
  - eliminate ensureSchema support in favor of starting tasks immediately?
  
@@ -89,33 +132,4 @@ Don't Do
  
  - Support either an NSDictionary or NSArray as the root of a JSON object. We can't support array's as the root currently because we tore the rowid in the root
    of the object.
-
-Done
-====
-
- - Cache JSON objects. Only deserialize and return an object once. (While in memory, we can always return the same object.)
-   Cache disposed objects as well for a defined amount of time. Update the cache on insert/update.
-   
- - Threading.
- 
-  - Add method to determine if JSON is the current value. (NTJsonCollection isJsonCurrent:) This will enable higher-level caching (Model level)
- 
-  - Error returns/handling.
- 
- - transaction support for insertBatch
- 
-  - deal with retain cycle between Store and Collections appropriately. Best idea so far: Collections maintain weak links to the Store. Application must
-   maintain an explicit reference to thet store to keep it open. Add an explicit command to close a store which would close all collections as well.
-
- - Replace NSProxy with custom NSDictionary implementation to improve performance
- 
- - allow path for store to be set.
-
- - Allow setting size of cache or disabling it entirely. Value = cache size, 0 = no caching but track used objects, -1 = no caching at all.
- 
-
-
-
-
- 
 

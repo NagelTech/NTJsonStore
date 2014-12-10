@@ -27,7 +27,7 @@
 /// The store this collection is a member of.
 @property (nonatomic,readonly) NTJsonStore *store;
 
-/// The error from the last operation. Useful when using synchroous API methods.
+/// The error from the last operation. Useful when using synchronous API methods.
 @property (nonatomic,readonly) NSError *lastError;
 
 /// Dictionary of default values for JSON keys. Default values are used in queries when the associated value does not exist in a JSON record.
