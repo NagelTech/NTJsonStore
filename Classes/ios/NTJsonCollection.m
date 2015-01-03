@@ -20,6 +20,7 @@
     NSArray *_indexes;
     NTJsonObjectCache *_objectCache;
     NSDictionary *_defaultJson;
+    NSDictionary *_aliases;
     NSError *_lastError;
     
     BOOL _isClosing;
@@ -54,6 +55,7 @@
         _columns = nil; // these are lazy loaded
         _indexes = nil; // lazy load
         _defaultJson = nil;
+        _aliases = nil;
         
         _pendingColumns = [NSMutableArray array];
         _pendingIndexes = [NSMutableArray array];
@@ -400,6 +402,180 @@
 
         [self.store saveMetadataWithKey:[self defaultJsonMetadataKey] value:_defaultJson];
     }];
+}
+
+
+#pragma mark - aliases
+
+
+-(NSString *)aliasesMetadataKey
+{
+    return [NSString stringWithFormat:@"%@/aliases", self.name];
+}
+
+
+-(NSDictionary *)aliases
+{
+    __block NSDictionary *aliases;
+    
+    [self.connection dispatchSync:^{
+        if ( !_aliases )
+        {
+            _aliases = [self.store metadataWithKey:[self aliasesMetadataKey]] ?: [NSDictionary dictionary];
+        }
+        
+        aliases = _aliases;
+    }];
+    
+    return aliases;
+}
+
+
+-(void)setAliases:(NSDictionary *)aliases
+{
+    aliases = [aliases copy] ?: @{};
+    
+    [self.connection dispatchAsync:^{
+        
+        // Update our internal variables...
+    
+        _aliases = aliases;
+        
+        // save our metadata...
+        
+        [self.store saveMetadataWithKey:[self aliasesMetadataKey] value:_aliases];
+    }];
+}
+
+
+-(NSString *)_replaceAliasesIn:(NSString *)string
+{
+    // note: this uses unichar (unicode 16) which is the native format for NSString.
+    // some characters (like emoji) would be 2 chars here, but that's unlikely to show up in
+    // query strings, so we ignore that case. If it became an issue we could convert to unicode 32
+    // with a performance penalty.
+    
+    // make a copy of the string so we can iterate over it quickly...
+    
+    unichar *buffer = malloc(sizeof(unichar) * string.length+1);
+    [string getCharacters:buffer];
+    buffer[string.length] = 0;  // make null terminated
+    
+    const unichar *start = buffer;
+    const unichar *ptr = start;
+
+    NSDictionary *aliases = [self aliases];
+    
+    NSMutableString *result = nil; // we initialize this when (and if) we actually use it...
+    
+    while (*ptr)
+    {
+        if ( isalpha(*ptr) || *ptr == '_')  // this is a possible alias
+        {
+            const unichar *startAlias = ptr;
+            
+            while (*ptr && (isalnum(*ptr) || *ptr == '_'))
+                ++ptr;
+            
+            NSString *alias = [[NSString alloc] initWithCharactersNoCopy:(unichar *)startAlias length:(ptr-startAlias) freeWhenDone:NO];
+            
+            NSString *value = aliases[alias];
+            
+            if ( value )
+            {
+                // append anything before the start of our alias first...
+                
+                if ( start != startAlias )
+                {
+                    if ( !result )
+                        result = [[NSMutableString alloc] initWithCharacters:(unichar *)start length:(startAlias-start)];
+                    else
+                        [result appendString:[[NSString alloc] initWithCharactersNoCopy:(unichar *)start length:(startAlias-start) freeWhenDone:NO]];
+                }
+                
+                // append the alias value...
+                
+                if ( !result )
+                    result = [[NSMutableString alloc] initWithString:value];
+                else
+                    [result appendString:value];
+                
+                // update our start pointer...
+                
+                start = ptr;
+            }
+        }
+        
+        else if ( *ptr == '\'' )    // quoted string
+        {
+            ++ptr;
+            
+            while (*ptr)
+            {
+                if ( *ptr == '\'' )
+                {
+                    ++ptr;
+                    
+                    if ( *ptr == '\'' )
+                        ++ptr; // embedded quote
+                    else
+                        break;
+                }
+                else
+                    ++ptr;
+            }
+        }
+        
+        else if ( *ptr == '[' )     // []-enclosed values are ignored
+        {
+            while (*ptr && *ptr != ']' )
+                ++ptr;
+            
+            if ( *ptr )
+                ++ptr;
+        }
+        
+        else    // a run of any other characters is ignored...
+        {
+            ++ptr;
+            
+            while (*ptr && !isalpha(*ptr) && *ptr != '_' && *ptr != '\'' && *ptr != '[' )
+                ++ptr;
+        }
+    }
+    
+    // Append anything we haven't gotten to yet...
+    
+    if ( result && ptr != start )
+        [result appendString:[[NSString alloc] initWithCharactersNoCopy:(unichar *)start length:(ptr-start) freeWhenDone:NO]];
+    
+    // free up our buffer
+    
+    free(buffer);   // always free the buffer!
+    buffer = nil; // for safety/sanity
+    
+    ptr = start = nil; // safety/sanity
+    
+    // if we have a result, return that, otherwise no replacements were made, so we can just return the original string.
+
+    return [(result ?: string) copy];
+}
+
+
+-(NSString *)replaceAliasesIn:(NSString *)string cacheable:(BOOL)cacheable
+{
+    if ( !string.length )
+        return string;
+    
+    // We haven't implemented caching for alias parsing yet. When we do, it will go right here.
+    
+    return [self _replaceAliasesIn:string];
+}
+
+
+-(NSString *)replaceAliasesIn:(NSString *)string
+{
+    return [self replaceAliasesIn:string cacheable:NO];
 }
 
 
@@ -758,7 +934,9 @@
 -(void)addQueryableFields:(NSString *)fields
 {
     [self.connection dispatchAsync:^{
-        [self scanSqlForNewColumns:fields];
+        NSString *realFields = [self replaceAliasesIn:fields cacheable:NO];
+        
+        [self scanSqlForNewColumns:realFields];
     }];
 }
 
@@ -849,19 +1027,22 @@
 -(void)addIndexWithKeys:(NSString *)keys isUnique:(BOOL)isUnique
 {
     [self.connection dispatchAsync:^{
+        
+        NSString *realKeys = [self replaceAliasesIn:keys cacheable:NO];
+        
         // First off, let's see if it already exists...
         
-        if ( [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
+        if ( [self.indexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:realKeys]; }] )
             return ;
         
-        if ( [_pendingIndexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:keys]; }] )
+        if ( [_pendingIndexes NTJsonStore_find:^BOOL(NTJsonIndex *index) { return (index.isUnique == isUnique) && [index.keys isEqualToString:realKeys]; }] )
             return ;
         
-        [self scanSqlForNewColumns:keys];
+        [self scanSqlForNewColumns:realKeys];
         
         NSString *name = [self createIndexNameWithIsUnique:isUnique];
         
-        NTJsonIndex *index = [NTJsonIndex indexWithName:name keys:keys isUnique:isUnique];
+        NTJsonIndex *index = [NTJsonIndex indexWithName:name keys:realKeys isUnique:isUnique];
         
         [_pendingIndexes addObject:index];
     }];
@@ -1195,6 +1376,8 @@
 
 -(int)_countWhere:(NSString *)where args:(NSArray *)args
 {
+    where = [self replaceAliasesIn:where cacheable:YES];
+    
     [self scanSqlForNewColumns:where];
 
     if ( ![self _ensureSchema] )
@@ -1281,6 +1464,9 @@
 
 -(NSArray *)_findWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
 {
+    where = [self replaceAliasesIn:where cacheable:YES];
+    orderBy = [self replaceAliasesIn:orderBy cacheable:YES];
+    
     [self scanSqlForNewColumns:where];
     [self scanSqlForNewColumns:orderBy];
 
@@ -1461,6 +1647,8 @@
 
 -(int)_removeWhere:(NSString *)where args:(NSArray *)args
 {
+    where = [self replaceAliasesIn:where cacheable:YES];
+    
     [self scanSqlForNewColumns:where];
     
     if ( ![self _ensureSchema] )

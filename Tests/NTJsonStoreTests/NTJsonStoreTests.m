@@ -170,4 +170,32 @@
 }
 
 
+-(void)testAliases
+{
+    NSDictionary *tests =
+    @{
+        @"test replace one not ones 123.45 not [one] not 'a one in here'": @"test replace [one] not ones 123.45 not [one] not 'a one in here'",
+        @"test multiple one two three": @"test multiple [one] [two] [three]",
+        @"'quote edge cases'": @"'quote edge cases'",
+        @"one 42": @"[one] 42",
+        @"42 one": @"42 [one]",
+      };
+    
+    NSDictionary *aliases = @{@"one": @"[one]", @"two": @"[two]", @"three": @"[three]"};
+    
+    NTJsonCollection *collection1 = [self.store collectionWithName:@"collection1"];
+
+    collection1.aliases = aliases;
+    
+    for (NSString *string in tests.allKeys)
+    {
+        NSString *parsed = [collection1 replaceAliasesIn:string];
+        NSString *expected = tests[string];
+        
+        XCTAssert([parsed isEqualToString:expected], @"Alias parsing failed. input \"%@\", expected \"%@\", actual \"%@\"", string, expected, parsed);
+    }
+    
+}
+
+
 @end

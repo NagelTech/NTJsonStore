@@ -33,6 +33,9 @@
 /// Dictionary of default values for JSON keys. Default values are used in queries when the associated value does not exist in a JSON record.
 @property (nonatomic) NSDictionary *defaultJson;
 
+/// Dictionary of string aliases (macros) to be replaced in any query string.
+@property (nonatomic) NSDictionary *aliases;
+
 /// the number of items to cache internally. Set to 0 to disable caching of items (the system will still track items that are in use and return the
 /// same instance.) Set to -1 to disable ALL caching - in this configuration a new NSDIctionary will be deserialized and returned for each request. Default: 50.
 @property (nonatomic) int cacheSize;
@@ -42,6 +45,9 @@
 -(void)addIndexWithKeys:(NSString *)keys;
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 -(void)addQueryableFields:(NSString *)fields;
+
+/// replace any aliases in string with the values from self.aliases. Useful for testing.
+-(NSString *)replaceAliasesIn:(NSString *)string;
 
 -(void)applyConfig:(NSDictionary *)config;
 -(BOOL)applyConfigFile:(NSString *)filename;
