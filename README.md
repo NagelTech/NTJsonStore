@@ -1,13 +1,39 @@
 # NTJsonStore
-NTJsonStore is a NOSQL-style store that uses SQLITE to ultimately store the data and do indexing. It stores JSON natively and is schemaless. Because it uses SQLITE we get fast indexes and a flexible query language (SQL WHERE clauses.)
 
-## Overview
+NTJsonStore is a schemaless document-oriented data store that will be immediately familiar of you have used MongoDB or similar systems. Key features include:
+ 
+ - **Document-oriented JSON storage.** Values are stored as JSON-compliant NSDictionaries. (The data that could be returned by `NSJSONSerialization` is supported.)
+ - **Full index support.** Data is ultimately stored in SQLITE, so you get the full performance and flexibility of SQLITE indexes. Unique and non-unique indexes, multiple keys and keys that are nested in the JSON are all supported.
+ - **Flexible queries.** Queries may contain any value that appears in your JSON document, including nested values using dot notation. Anything that is allowed in a SQLITE WHERE clause is allowed, as long as you stick to a single collection (TABLE.)
+ - **No upgrade headaches.** Because the data is essentially schemaless, you are not required to "upgrade" the data store with application updates. Of course this might put an additional burden on the code that is using the data because you may encounter old or new data, but it's usually easy enough to work around.
+ - **Simple multi-threading support.** Any call may be performed synchronously or asynchronously. The system will make sure operations for each collection happen in the same order. There is no concept of multiple contexts to deal with.
 
-The `NTJsonStore` is a container for a group of `NTJsonCollections`. It owns the underlying SQLITE store and has methods to assist in synchronizing operations across collections. Each store has a global key-value collection of metadata which can b used to store aditional data about the store or collections. Collections are created as they are first accessed, so there is no explicit process to create a collection.
 
-Each collection is represented by a `NTJsonCollection` object which is responsible for all access to an individual collection. Colletions are created when they are first accessed and are schema-less.
+## API Overview
+---
+
+The `NTJsonStore` is a container for a group of `NTJsonCollections`. It owns the underlying SQLITE store and has methods to assist in synchronizing operations across collections. Each store has a global key-value collection of metadata which can be used to store aditional data about the store or collections. Collections are created as they are first accessed, so there is no explicit process to create a collection.
+
+Each collection is represented by a `NTJsonCollection` object which is responsible for all access to an individual collection. Collections are created when they are first accessed and are schema-less.
+
+### A Simple Example
+
+	NTJsonStore *store = [[NTJsonStore alloc] initWithName:@"sample.db"];
+	NSJsonCollection *collection = [store collectionWithName:@"users"];
+	
+	// these are optional but improve performance...
+	[collection addIndex:@"[last_name], [first_name]"];
+	[collection addQueryableFields:@"[address.country]"];
+	
+	NSString *country = @"US";
+	NSArray *users = [collection findWhere:@"[address.country] = ?" args:@[country] orderBy:@"[last_name], [first_name]"];
+	
+	for(NSDictionary *user in users)
+		NSLog(@"%@, %@", user[@"last_name"], user[@"first_name"]);
+
 
 ## Configuration
+---
 
 The Store encapsulates the database and allows access to the array of collections. The `storePath` defaults to the caches directory and the `storeName	 defaults to 'NTJsonStore.db'. These properties can be change any time before the store is first accessed.
 
@@ -25,46 +51,58 @@ These values are persisted between starts of the app (except for cache size whic
 
 In addition to coniguring the values manually  by calling the methods above, items can be configured by passing a JSON configuration to `-applyJson:'.
 
-
  
-Query Strings
-=============
+## Query Strings
+---
 
- - In general, anything valid in a SQLITE WHERE clause is valid in a query string.
-- All JSON values must be enclosed in square braces. Nested JSON values are allowed using "." notation.
- - Cross-table queries are ~not~ allowed.
+Query strings are a subset of the SQLITE WHERE clause where JSON fields are enclosed in square braces. Values may be used by inserting a ? in the query string and adding the value in the `args` array. (Parameterized SQL.) The major limitation to keep in mind that NTJsonStore, like most documented-orieted systems, is not a relational store, so **queries are limited to a single collection**.
+
+ - All JSON fields must be enclosed in square braces. Nested JSON fields are allowed using "." notation.
+ - Cross-table queries are *not* allowed.
  - The store automatically  maintains columns for you in SQL to perform the queries. The first time a new field is used the column must be "materialized" - if the collection is large this can cause a performance impact.
  - You can tell the system which columns you plan on accessing by setting the "QuerableFields" either in the config or by calling the method. This will materialize any missing columns immediately.
  - Any other time you reference columns, such as in an order by clause, defining indexes or queryable fields, square braces are required enclosing the field names.
+ 
 
-`NTJsonRowId`
-===========
+## NTJsonRowId
+---
 
-Each record returned from NTJsonStore has a row id that is guaranteed to be unique per collection. (This id increments for each new record and is not re-used.) This is returned as "__rowid__" (`NTjsonRowIdKey`)
+Each record returned from NTJsonStore has a row id that is guaranteed to be unique per collection. (This id increments for each new record and is not re-used.) This is returned in the JSON as "__rowid__" (`NTjsonRowIdKey`)
 
 
-Threading & Synchronization
-===========================
+## Threading & Synchronization
+---
 
 `NTJsonStore` uses libdispatch for threading. Each collection maintains it's own serial queue for all operations. Operations may be performed synchronously with the calling thread or asynchrounously. For asynchrounous calls you may define a specific queue to run on. You may also force the completion handler to run on the internal queue for a collection by passing `NTJsonStoreSerialQueue` - this can be useful when coordinating multiple actions.
 
 Additionally, the `NTJsonStore` has synchronization methods that allow you to synchronize the queues across multiple collections.
 
 
-Default JSON
-============
+## Default JSON
+---
 
- - default values for any fields in JSON
- - used as a default in queries when the field is not present in the JSON.
+Each collection has a `defaultJson` property which has any defaults used during queries when a value is not present in the JSON document. This is very handy when, say you want to treat a boolean value as false if it is not present.
 
 
-Caching
-=======
+## Caching
+---
 
  - LRU cache
  - set cache size, default is 40 records
  - set cache to 0 to only track used JSON objects
  - sett cache to -1 to disable all caching, including tracking of used JSON objects.
+ 
+ 
+## Metadata store
+---
+
+fsdf
+
+
+---
+---
+---
+---
 
 
 To Do 1.0
