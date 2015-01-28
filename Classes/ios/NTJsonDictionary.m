@@ -13,7 +13,7 @@
 #define dict _cacheItem->_json
 
 
-@interface NTJsonDictionary ()
+@interface NTJsonDictionary () <NSCopying>
 {
     NTJsonObjectCacheItem *_cacheItem;
 }
@@ -118,6 +118,11 @@
     return [dict enumerateKeysAndObjectsWithOptions:opts usingBlock:block];
 }
 
+
+-(id)copyWithZone:(NSZone *)zone
+{
+    return self;
+}
 
 
 @end
