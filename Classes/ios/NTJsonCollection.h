@@ -37,13 +37,19 @@
 @property (nonatomic) NSDictionary *aliases;
 
 /// the number of items to cache internally. Set to 0 to disable caching of items (the system will still track items that are in use and return the
-/// same instance.) Set to -1 to disable ALL caching - in this configuration a new NSDIctionary will be deserialized and returned for each request. Default: 50.
+/// same instance.) Set to -1 to disable ALL caching - in this configuration a new NSDictionary will be deserialized and returned for each request. Default: 50.
 @property (nonatomic) int cacheSize;
 
-/// Add an index with the key string if it doesn't already exist. Calling this has no effect if the index already exists.
-/// @param keys a comma-separated list of JSON paths paths to index on. All
+/// Add a unique index with the key string if it doesn't already exist. Calling this has no effect if the index already exists.
+/// @param keys a comma-separated list of JSON paths paths to index on.
 -(void)addIndexWithKeys:(NSString *)keys;
+
+/// Add an index with the key string if it doesn't already exist. Calling this has no effect if the index already exists.
+/// @param keys a comma-separated list of JSON paths paths to index on.
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
+
+/// Ensure that the passed JSON paths are queryable. This is a performance optionization and is optional. If queryable fields are pre-declared they will be added the first time they are used in a query.
+/// @param keys a comma-separated list of JSON paths paths.
 -(void)addQueryableFields:(NSString *)fields;
 
 /// replace any aliases in string with the values from self.aliases. Useful for testing.
@@ -52,6 +58,9 @@
 -(void)applyConfig:(NSDictionary *)config;
 -(BOOL)applyConfigFile:(NSString *)filename;
 
+/**
+ *  Flushes any items in the LRU cache.
+ */
 -(void)flushCache;
 
 /// ensure all pending schema changes this collection have been committed to the data store. Changes to indexes, queryable fields and
@@ -83,7 +92,6 @@
 /// defaults will all be written when this call completes.
 /// @returns YES on success. On failure NO is returned. You may check lastError to get ore information on the error.
 -(BOOL)ensureSchema;
-
 
 /// Insert the json as a new record into the collection. On success the rowid of the new record is passed to the completion handler.
 /// @param json the JSON dictionary to insert.

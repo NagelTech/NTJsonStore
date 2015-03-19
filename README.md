@@ -110,7 +110,7 @@ Additionally, the `NTJsonStore` has synchronization methods that allow you to sy
 
 By default the system maintains two caches for each collection:
  - *In use items.* Some magic is used in the background to determine if a JSON document s still in use by the application (a reference count is maintained) For these items, the same value is always returned.
-  - *Cached items.* Once items fall out of the "in use" cache, they are collected into an LRU cache. By default, 40 entries are maintained in the cache
+  - *Cached items.* Once items fall out of the "in use" cache, they are collected into an LRU cache. By default, 50 entries are maintained in the cache
   
 Set the `cacheSize` to a positive value to set the size of the LRU cache or 0 to disable it. Set `cacheSize` to -1 to disable all caching, including in use item caching.
 
