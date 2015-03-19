@@ -44,13 +44,14 @@
 {
     NSMutableDictionary *_items;
     NSMutableArray *_cachedItems;
+    dispatch_queue_t _deallocQueue;
 }
 
 
 @property (nonatomic) int cacheSize;
 
--(id)initWithCacheSize:(int)cacheSize;
--(id)init;
+-(id)initWithCacheSize:(int)cacheSize deallocQueue:(dispatch_queue_t)deallocQueue;
+-(id)initWithDeallocQueue:(dispatch_queue_t)deallocQueue;
 
 -(NSDictionary *)jsonWithRowId:(NTJsonRowId)rowId;
 -(id)addJson:(NSDictionary *)json withRowId:(NTJsonRowId)rowId;

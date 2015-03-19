@@ -70,7 +70,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
 @implementation NTJsonObjectCache
 
 
--(id)initWithCacheSize:(int)cacheSize
+-(id)initWithCacheSize:(int)cacheSize deallocQueue:(dispatch_queue_t)deallocQueue
 {
     self = [super init];
     
@@ -79,15 +79,16 @@ static const int DEFAULT_CACHE_SIZE = 50;
         _cacheSize = cacheSize;
         _items = [NSMutableDictionary dictionary];
         _cachedItems = [NSMutableArray array];
+        _deallocQueue = deallocQueue;
     }
     
     return self;
 }
 
 
--(id)init
+-(id)initWithDeallocQueue:(dispatch_queue_t)deallocQueue
 {
-    return [self initWithCacheSize:DEFAULT_CACHE_SIZE];
+    return [self initWithCacheSize:DEFAULT_CACHE_SIZE deallocQueue:deallocQueue];
 }
 
 
@@ -104,13 +105,15 @@ static const int DEFAULT_CACHE_SIZE = 50;
 
 -(void)proxyDeallocedForCacheItem:(NTJsonObjectCacheItem *)cacheItem
 {
-    CACHE_LOG(@"Caching - %d", (int)cacheItem.rowId);
-    
-    cacheItem.isInUse = NO;
-    [_cachedItems addObject:cacheItem]; // newest are at end of the list.
-    
-    if ( !_cachedItems.count > _cacheSize )
-        [self purgeCacheWithFlushAll:NO];
+    dispatch_async(_deallocQueue, ^{
+        CACHE_LOG(@"Caching - %d", (int)cacheItem.rowId);
+
+        cacheItem.isInUse = NO;
+        [_cachedItems addObject:cacheItem]; // newest are at end of the list.
+
+        if ( !_cachedItems.count > _cacheSize )
+            [self purgeCacheWithFlushAll:NO];
+    });
 }
 
 

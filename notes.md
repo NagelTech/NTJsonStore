@@ -5,9 +5,7 @@ To Do 1.0
 
  - sample application (freebase?)
 
- - ensure thread safety when deallocing NTJsonDictionary instances
-
- - General thread safety clean-up (flushCache for instance is not protected.)
+ - General thread safety validation pass
 
  - Consider removing NTJsonDictionary all together in favor of plain vanilla NSDictionaries. (May impact cache performance.)
 

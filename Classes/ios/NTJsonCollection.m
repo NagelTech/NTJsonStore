@@ -51,7 +51,6 @@
     {
         _store = store;
         _name = name;
-        _objectCache = [[NTJsonObjectCache alloc] init];
         _columns = nil; // these are lazy loaded
         _indexes = nil; // lazy load
         _defaultJson = nil;
@@ -60,8 +59,9 @@
         _pendingColumns = [NSMutableArray array];
         _pendingIndexes = [NSMutableArray array];
         _connection = [[NTJsonSqlConnection alloc] initWithFilename:store.storeFilename connectionName:self.name];
+        _objectCache = [[NTJsonObjectCache alloc] initWithDeallocQueue:_connection.queue];
     }
-    
+
     return self;
 }
 
@@ -174,32 +174,42 @@
 
 -(int)cacheSize
 {
-    return (_objectCache) ? _objectCache.cacheSize : -1;
+    __block int cacheSize;
+
+    [self.connection dispatchSync:^{
+        cacheSize =  (_objectCache) ? _objectCache.cacheSize : -1;
+    }];
+
+    return cacheSize;
 }
 
 
 -(void)setCacheSize:(int)cacheSize
 {
-    if ( (cacheSize < 0 && !_objectCache) || (_objectCache.cacheSize == cacheSize) )
-        return;
-    
-    if ( cacheSize < 0 )
-        _objectCache = nil; // no cache
-    
-    else
-    {
-        if ( !_objectCache )
-            _objectCache = [[NTJsonObjectCache alloc] initWithCacheSize:cacheSize];
-        
+    [self.connection dispatchAsync:^{
+        if ( (cacheSize < 0 && !_objectCache) || (_objectCache.cacheSize == cacheSize) )
+            return;
+
+        if ( cacheSize < 0 )
+            _objectCache = nil; // no cache
+
         else
-            _objectCache.cacheSize = cacheSize;
-    }
+        {
+            if ( !_objectCache )
+                _objectCache = [[NTJsonObjectCache alloc] initWithCacheSize:cacheSize deallocQueue:self.connection.queue];
+
+            else
+                _objectCache.cacheSize = cacheSize;
+        }
+    }];
 }
 
 
 -(void)flushCache
 {
-    [_objectCache flush];
+    [self.connection dispatchAsync:^{
+        [_objectCache flush];
+    }];
 }
 
 
