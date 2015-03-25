@@ -1,398 +1,777 @@
-// !$*UTF8*$!
-{
-	archiveVersion = 1;
-	classes = {
-	};
-	objectVersion = 46;
-	objects = {
-
-/* Begin PBXBuildFile section */
-		F02A134A191A920000812515 /* BaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = F02A1349191A920000812515 /* BaseTestCase.m */; };
-		F02A1371192270FD00812515 /* NTJsonDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = F02A1370192270FD00812515 /* NTJsonDictionary.m */; };
-		F064B20E1A89299F00CF1AAF /* notes.md in Sources */ = {isa = PBXBuildFile; fileRef = F064B20D1A89299F00CF1AAF /* notes.md */; };
-		F09D07A2196E11010073ACCE /* NTJsonStoreTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = F09D07A1196E11010073ACCE /* NTJsonStoreTypes.m */; };
-		F0A410401916E7350046480F /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0A4103F1916E7350046480F /* XCTest.framework */; };
-		F0A410421916E7350046480F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0A410411916E7350046480F /* Foundation.framework */; };
-		F0A410441916E7350046480F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F0A410431916E7350046480F /* UIKit.framework */; };
-		F0A4104A1916E7350046480F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F0A410481916E7350046480F /* InfoPlist.strings */; };
-		F0A4104C1916E7350046480F /* NTJsonStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A4104B1916E7350046480F /* NTJsonStoreTests.m */; };
-		F0A410B3191703CA0046480F /* NSArray+NTJsonStorePrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A4109F191703CA0046480F /* NSArray+NTJsonStorePrivate.m */; };
-		F0A410B4191703CA0046480F /* NSDictionary+NTJsonStorePrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410A1191703CA0046480F /* NSDictionary+NTJsonStorePrivate.m */; };
-		F0A410B5191703CA0046480F /* NSError+NTJsonStorePrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410A3191703CA0046480F /* NSError+NTJsonStorePrivate.m */; };
-		F0A410B6191703CA0046480F /* NTJsonCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410A5191703CA0046480F /* NTJsonCollection.m */; };
-		F0A410B7191703CA0046480F /* NTJsonColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410A7191703CA0046480F /* NTJsonColumn.m */; };
-		F0A410B8191703CA0046480F /* NTJsonIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410A9191703CA0046480F /* NTJsonIndex.m */; };
-		F0A410B9191703CA0046480F /* NTJsonObjectCache.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410AB191703CA0046480F /* NTJsonObjectCache.m */; };
-		F0A410BA191703CA0046480F /* NTJsonSqlConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410AD191703CA0046480F /* NTJsonSqlConnection.m */; };
-		F0A410BB191703CA0046480F /* NTJsonStore.m in Sources */ = {isa = PBXBuildFile; fileRef = F0A410B0191703CA0046480F /* NTJsonStore.m */; };
-		F0A410BF191703DE0046480F /* NTJsonStore.podspec in Resources */ = {isa = PBXBuildFile; fileRef = F0A410BC191703DE0046480F /* NTJsonStore.podspec */; };
-		F0A410C0191703DE0046480F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F0A410BD191703DE0046480F /* README.md */; };
-		F0A410C1191703DE0046480F /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = F0A410BE191703DE0046480F /* LICENSE */; };
-		F0A410C3191704BF0046480F /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F0A410C2191704BF0046480F /* libsqlite3.dylib */; };
-/* End PBXBuildFile section */
-
-/* Begin PBXFileReference section */
-		F02A1348191A920000812515 /* BaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseTestCase.h; sourceTree = "<group>"; };
-		F02A1349191A920000812515 /* BaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseTestCase.m; sourceTree = "<group>"; };
-		F02A136F192270FD00812515 /* NTJsonDictionary+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonDictionary+Private.h"; sourceTree = "<group>"; };
-		F02A1370192270FD00812515 /* NTJsonDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonDictionary.m; sourceTree = "<group>"; };
-		F064B20D1A89299F00CF1AAF /* notes.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = notes.md; path = ../../notes.md; sourceTree = "<group>"; };
-		F09D07A1196E11010073ACCE /* NTJsonStoreTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonStoreTypes.m; sourceTree = "<group>"; };
-		F0A4103C1916E7350046480F /* NTJsonStoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NTJsonStoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F0A4103F1916E7350046480F /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		F0A410411916E7350046480F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		F0A410431916E7350046480F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		F0A410471916E7350046480F /* NTJsonStoreTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NTJsonStoreTests-Info.plist"; sourceTree = "<group>"; };
-		F0A410491916E7350046480F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		F0A4104B1916E7350046480F /* NTJsonStoreTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NTJsonStoreTests.m; sourceTree = "<group>"; };
-		F0A4104D1916E7350046480F /* NTJsonStoreTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NTJsonStoreTests-Prefix.pch"; sourceTree = "<group>"; };
-		F0A4109E191703CA0046480F /* NSArray+NTJsonStorePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+NTJsonStorePrivate.h"; sourceTree = "<group>"; };
-		F0A4109F191703CA0046480F /* NSArray+NTJsonStorePrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+NTJsonStorePrivate.m"; sourceTree = "<group>"; };
-		F0A410A0191703CA0046480F /* NSDictionary+NTJsonStorePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+NTJsonStorePrivate.h"; sourceTree = "<group>"; };
-		F0A410A1191703CA0046480F /* NSDictionary+NTJsonStorePrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+NTJsonStorePrivate.m"; sourceTree = "<group>"; };
-		F0A410A2191703CA0046480F /* NSError+NTJsonStorePrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+NTJsonStorePrivate.h"; sourceTree = "<group>"; };
-		F0A410A3191703CA0046480F /* NSError+NTJsonStorePrivate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+NTJsonStorePrivate.m"; sourceTree = "<group>"; };
-		F0A410A4191703CA0046480F /* NTJsonCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonCollection.h; sourceTree = "<group>"; };
-		F0A410A5191703CA0046480F /* NTJsonCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonCollection.m; sourceTree = "<group>"; };
-		F0A410A6191703CA0046480F /* NTJsonCollection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonCollection+Private.h"; sourceTree = "<group>"; };
-		F0A410A7191703CA0046480F /* NTJsonColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonColumn.m; sourceTree = "<group>"; };
-		F0A410A8191703CA0046480F /* NTJsonColumn+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonColumn+Private.h"; sourceTree = "<group>"; };
-		F0A410A9191703CA0046480F /* NTJsonIndex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonIndex.m; sourceTree = "<group>"; };
-		F0A410AA191703CA0046480F /* NTJsonIndex+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonIndex+Private.h"; sourceTree = "<group>"; };
-		F0A410AB191703CA0046480F /* NTJsonObjectCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonObjectCache.m; sourceTree = "<group>"; };
-		F0A410AC191703CA0046480F /* NTJsonObjectCache+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonObjectCache+Private.h"; sourceTree = "<group>"; };
-		F0A410AD191703CA0046480F /* NTJsonSqlConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonSqlConnection.m; sourceTree = "<group>"; };
-		F0A410AE191703CA0046480F /* NTJsonSqlConnection+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonSqlConnection+Private.h"; sourceTree = "<group>"; };
-		F0A410AF191703CA0046480F /* NTJsonStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonStore.h; sourceTree = "<group>"; };
-		F0A410B0191703CA0046480F /* NTJsonStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTJsonStore.m; sourceTree = "<group>"; };
-		F0A410B1191703CA0046480F /* NTJsonStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NTJsonStore+Private.h"; sourceTree = "<group>"; };
-		F0A410B2191703CA0046480F /* NTJsonStoreTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTJsonStoreTypes.h; sourceTree = "<group>"; };
-		F0A410BC191703DE0046480F /* NTJsonStore.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = NTJsonStore.podspec; path = ../../NTJsonStore.podspec; sourceTree = "<group>"; };
-		F0A410BD191703DE0046480F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
-		F0A410BE191703DE0046480F /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = LICENSE; path = ../../LICENSE; sourceTree = "<group>"; };
-		F0A410C2191704BF0046480F /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
-/* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		F0A410391916E7350046480F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F0A410C3191704BF0046480F /* libsqlite3.dylib in Frameworks */,
-				F0A410401916E7350046480F /* XCTest.framework in Frameworks */,
-				F0A410441916E7350046480F /* UIKit.framework in Frameworks */,
-				F0A410421916E7350046480F /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
-/* Begin PBXGroup section */
-		F0A410311916E7200046480F = {
-			isa = PBXGroup;
-			children = (
-				F0A410451916E7350046480F /* NTJsonStoreTests */,
-				F0A4103E1916E7350046480F /* Frameworks */,
-				F0A4103D1916E7350046480F /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		F0A4103D1916E7350046480F /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				F0A4103C1916E7350046480F /* NTJsonStoreTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		F0A4103E1916E7350046480F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F0A410C2191704BF0046480F /* libsqlite3.dylib */,
-				F0A4103F1916E7350046480F /* XCTest.framework */,
-				F0A410411916E7350046480F /* Foundation.framework */,
-				F0A410431916E7350046480F /* UIKit.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		F0A410451916E7350046480F /* NTJsonStoreTests */ = {
-			isa = PBXGroup;
-			children = (
-				F0A4109D191703B10046480F /* NTJsonStore */,
-				F0A410461916E7350046480F /* Supporting Files */,
-				F02A1348191A920000812515 /* BaseTestCase.h */,
-				F02A1349191A920000812515 /* BaseTestCase.m */,
-				F0A4104B1916E7350046480F /* NTJsonStoreTests.m */,
-			);
-			path = NTJsonStoreTests;
-			sourceTree = "<group>";
-		};
-		F0A410461916E7350046480F /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				F0A410471916E7350046480F /* NTJsonStoreTests-Info.plist */,
-				F0A410481916E7350046480F /* InfoPlist.strings */,
-				F0A4104D1916E7350046480F /* NTJsonStoreTests-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		F0A4109D191703B10046480F /* NTJsonStore */ = {
-			isa = PBXGroup;
-			children = (
-				F0A410BE191703DE0046480F /* LICENSE */,
-				F064B20D1A89299F00CF1AAF /* notes.md */,
-				F0A4109E191703CA0046480F /* NSArray+NTJsonStorePrivate.h */,
-				F0A4109F191703CA0046480F /* NSArray+NTJsonStorePrivate.m */,
-				F0A410A0191703CA0046480F /* NSDictionary+NTJsonStorePrivate.h */,
-				F0A410A1191703CA0046480F /* NSDictionary+NTJsonStorePrivate.m */,
-				F0A410A2191703CA0046480F /* NSError+NTJsonStorePrivate.h */,
-				F0A410A3191703CA0046480F /* NSError+NTJsonStorePrivate.m */,
-				F0A410A4191703CA0046480F /* NTJsonCollection.h */,
-				F0A410A5191703CA0046480F /* NTJsonCollection.m */,
-				F0A410A6191703CA0046480F /* NTJsonCollection+Private.h */,
-				F0A410A7191703CA0046480F /* NTJsonColumn.m */,
-				F0A410A8191703CA0046480F /* NTJsonColumn+Private.h */,
-				F02A1370192270FD00812515 /* NTJsonDictionary.m */,
-				F02A136F192270FD00812515 /* NTJsonDictionary+Private.h */,
-				F0A410A9191703CA0046480F /* NTJsonIndex.m */,
-				F0A410AA191703CA0046480F /* NTJsonIndex+Private.h */,
-				F0A410AB191703CA0046480F /* NTJsonObjectCache.m */,
-				F0A410AC191703CA0046480F /* NTJsonObjectCache+Private.h */,
-				F0A410AD191703CA0046480F /* NTJsonSqlConnection.m */,
-				F0A410AE191703CA0046480F /* NTJsonSqlConnection+Private.h */,
-				F0A410AF191703CA0046480F /* NTJsonStore.h */,
-				F0A410B0191703CA0046480F /* NTJsonStore.m */,
-				F0A410BC191703DE0046480F /* NTJsonStore.podspec */,
-				F0A410B1191703CA0046480F /* NTJsonStore+Private.h */,
-				F0A410B2191703CA0046480F /* NTJsonStoreTypes.h */,
-				F09D07A1196E11010073ACCE /* NTJsonStoreTypes.m */,
-				F0A410BD191703DE0046480F /* README.md */,
-			);
-			name = NTJsonStore;
-			path = ../../Classes/ios;
-			sourceTree = "<group>";
-		};
-/* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		F0A4103B1916E7350046480F /* NTJsonStoreTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F0A4104E1916E7350046480F /* Build configuration list for PBXNativeTarget "NTJsonStoreTests" */;
-			buildPhases = (
-				F0A410381916E7350046480F /* Sources */,
-				F0A410391916E7350046480F /* Frameworks */,
-				F0A4103A1916E7350046480F /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = NTJsonStoreTests;
-			productName = NTJsonStoreTests;
-			productReference = F0A4103C1916E7350046480F /* NTJsonStoreTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-/* End PBXNativeTarget section */
-
-/* Begin PBXProject section */
-		F0A410321916E7200046480F /* Project object */ = {
-			isa = PBXProject;
-			attributes = {
-				LastUpgradeCheck = 0510;
-			};
-			buildConfigurationList = F0A410351916E7200046480F /* Build configuration list for PBXProject "NTJsonStoreTests" */;
-			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
-			hasScannedForEncodings = 0;
-			knownRegions = (
-				en,
-			);
-			mainGroup = F0A410311916E7200046480F;
-			productRefGroup = F0A4103D1916E7350046480F /* Products */;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				F0A4103B1916E7350046480F /* NTJsonStoreTests */,
-			);
-		};
-/* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		F0A4103A1916E7350046480F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F0A410C0191703DE0046480F /* README.md in Resources */,
-				F0A410BF191703DE0046480F /* NTJsonStore.podspec in Resources */,
-				F0A410C1191703DE0046480F /* LICENSE in Resources */,
-				F0A4104A1916E7350046480F /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		F0A410381916E7350046480F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F0A410B3191703CA0046480F /* NSArray+NTJsonStorePrivate.m in Sources */,
-				F0A410BB191703CA0046480F /* NTJsonStore.m in Sources */,
-				F064B20E1A89299F00CF1AAF /* notes.md in Sources */,
-				F0A410B5191703CA0046480F /* NSError+NTJsonStorePrivate.m in Sources */,
-				F0A410BA191703CA0046480F /* NTJsonSqlConnection.m in Sources */,
-				F0A410B8191703CA0046480F /* NTJsonIndex.m in Sources */,
-				F0A4104C1916E7350046480F /* NTJsonStoreTests.m in Sources */,
-				F0A410B6191703CA0046480F /* NTJsonCollection.m in Sources */,
-				F02A1371192270FD00812515 /* NTJsonDictionary.m in Sources */,
-				F0A410B9191703CA0046480F /* NTJsonObjectCache.m in Sources */,
-				F09D07A2196E11010073ACCE /* NTJsonStoreTypes.m in Sources */,
-				F0A410B4191703CA0046480F /* NSDictionary+NTJsonStorePrivate.m in Sources */,
-				F02A134A191A920000812515 /* BaseTestCase.m in Sources */,
-				F0A410B7191703CA0046480F /* NTJsonColumn.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
-
-/* Begin PBXVariantGroup section */
-		F0A410481916E7350046480F /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F0A410491916E7350046480F /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
-/* Begin XCBuildConfiguration section */
-		F0A410361916E7200046480F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = NTJsonStore_SHOW_SQL;
-			};
-			name = Debug;
-		};
-		F0A410371916E7200046480F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = NTJsonStore_SHOW_SQL;
-			};
-			name = Release;
-		};
-		F0A4104F1916E7350046480F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "NTJsonStoreTests/NTJsonStoreTests-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "NTJsonStoreTests/NTJsonStoreTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		F0A410501916E7350046480F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "NTJsonStoreTests/NTJsonStoreTests-Prefix.pch";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "NTJsonStoreTests/NTJsonStoreTests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				VALIDATE_PRODUCT = YES;
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
-/* End XCBuildConfiguration section */
-
-/* Begin XCConfigurationList section */
-		F0A410351916E7200046480F /* Build configuration list for PBXProject "NTJsonStoreTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F0A410361916E7200046480F /* Debug */,
-				F0A410371916E7200046480F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F0A4104E1916E7350046480F /* Build configuration list for PBXNativeTarget "NTJsonStoreTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F0A4104F1916E7350046480F /* Debug */,
-				F0A410501916E7350046480F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-/* End XCConfigurationList section */
-	};
-	rootObject = F0A410321916E7200046480F /* Project object */;
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>archiveVersion</key>
+	<string>1</string>
+	<key>classes</key>
+	<dict/>
+	<key>objectVersion</key>
+	<string>46</string>
+	<key>objects</key>
+	<dict>
+		<key>0384BF0CC1176B74F29A8D53</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array/>
+			<key>inputPaths</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXShellScriptBuildPhase</string>
+			<key>name</key>
+			<string>Check Pods Manifest.lock</string>
+			<key>outputPaths</key>
+			<array/>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+			<key>shellPath</key>
+			<string>/bin/sh</string>
+			<key>shellScript</key>
+			<string>diff "${PODS_ROOT}/../Podfile.lock" "${PODS_ROOT}/Manifest.lock" &gt; /dev/null
+if [[ $? != 0 ]] ; then
+    cat &lt;&lt; EOM
+error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
+EOM
+    exit 1
+fi
+</string>
+			<key>showEnvVarsInLog</key>
+			<string>0</string>
+		</dict>
+		<key>0CDD1F470C32FA264A7983A6</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>E31781205FBB1A6373DDC09C</string>
+				<string>255C472FBE6AAC9EC90CAFA0</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Pods</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>255C472FBE6AAC9EC90CAFA0</key>
+		<dict>
+			<key>includeInIndex</key>
+			<string>1</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.xcconfig</string>
+			<key>name</key>
+			<string>Pods-NTJsonStoreTests.release.xcconfig</string>
+			<key>path</key>
+			<string>Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.release.xcconfig</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>289493FE0544586A2FA64087</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F8FB8BF83942B63AA56C4CB5</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>2CFD2F6054B74FDA9A82F2AB</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array/>
+			<key>inputPaths</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXShellScriptBuildPhase</string>
+			<key>name</key>
+			<string>Copy Pods Resources</string>
+			<key>outputPaths</key>
+			<array/>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+			<key>shellPath</key>
+			<string>/bin/sh</string>
+			<key>shellScript</key>
+			<string>"${SRCROOT}/Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests-resources.sh"
+</string>
+			<key>showEnvVarsInLog</key>
+			<string>0</string>
+		</dict>
+		<key>E31781205FBB1A6373DDC09C</key>
+		<dict>
+			<key>includeInIndex</key>
+			<string>1</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.xcconfig</string>
+			<key>name</key>
+			<string>Pods-NTJsonStoreTests.debug.xcconfig</string>
+			<key>path</key>
+			<string>Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.debug.xcconfig</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F02A1348191A920000812515</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>BaseTestCase.h</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F02A1349191A920000812515</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>BaseTestCase.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F02A134A191A920000812515</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F02A1349191A920000812515</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F05F138B1AC3109C00B02DEF</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>folder</string>
+			<key>name</key>
+			<string>NTJsonStore</string>
+			<key>path</key>
+			<string>..</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F05F138C1AC3109C00B02DEF</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F05F138B1AC3109C00B02DEF</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F05F138D1AC310CA00B02DEF</key>
+		<dict>
+			<key>fileEncoding</key>
+			<string>4</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text</string>
+			<key>path</key>
+			<string>Podfile</string>
+			<key>sourceTree</key>
+			<string>SOURCE_ROOT</string>
+		</dict>
+		<key>F05F138E1AC310CA00B02DEF</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F05F138D1AC310CA00B02DEF</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A410311916E7200046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F05F138B1AC3109C00B02DEF</string>
+				<string>F0A410451916E7350046480F</string>
+				<string>F0A4103E1916E7350046480F</string>
+				<string>F0A4103D1916E7350046480F</string>
+				<string>0CDD1F470C32FA264A7983A6</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A410321916E7200046480F</key>
+		<dict>
+			<key>attributes</key>
+			<dict>
+				<key>LastUpgradeCheck</key>
+				<string>0510</string>
+			</dict>
+			<key>buildConfigurationList</key>
+			<string>F0A410351916E7200046480F</string>
+			<key>compatibilityVersion</key>
+			<string>Xcode 3.2</string>
+			<key>developmentRegion</key>
+			<string>English</string>
+			<key>hasScannedForEncodings</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXProject</string>
+			<key>knownRegions</key>
+			<array>
+				<string>en</string>
+			</array>
+			<key>mainGroup</key>
+			<string>F0A410311916E7200046480F</string>
+			<key>productRefGroup</key>
+			<string>F0A4103D1916E7350046480F</string>
+			<key>projectDirPath</key>
+			<string></string>
+			<key>projectReferences</key>
+			<array/>
+			<key>projectRoot</key>
+			<string></string>
+			<key>targets</key>
+			<array>
+				<string>F0A4103B1916E7350046480F</string>
+			</array>
+		</dict>
+		<key>F0A410351916E7200046480F</key>
+		<dict>
+			<key>buildConfigurations</key>
+			<array>
+				<string>F0A410361916E7200046480F</string>
+				<string>F0A410371916E7200046480F</string>
+			</array>
+			<key>defaultConfigurationIsVisible</key>
+			<string>0</string>
+			<key>defaultConfigurationName</key>
+			<string>Release</string>
+			<key>isa</key>
+			<string>XCConfigurationList</string>
+		</dict>
+		<key>F0A410361916E7200046480F</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<string>NTJsonStore_SHOW_SQL</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Debug</string>
+		</dict>
+		<key>F0A410371916E7200046480F</key>
+		<dict>
+			<key>buildSettings</key>
+			<dict>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<string>NTJsonStore_SHOW_SQL</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Release</string>
+		</dict>
+		<key>F0A410381916E7350046480F</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>F0A4104C1916E7350046480F</string>
+				<string>F02A134A191A920000812515</string>
+			</array>
+			<key>isa</key>
+			<string>PBXSourcesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>F0A410391916E7350046480F</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>F0A410C3191704BF0046480F</string>
+				<string>F0A410401916E7350046480F</string>
+				<string>F0A410441916E7350046480F</string>
+				<string>F0A410421916E7350046480F</string>
+				<string>289493FE0544586A2FA64087</string>
+			</array>
+			<key>isa</key>
+			<string>PBXFrameworksBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>F0A4103A1916E7350046480F</key>
+		<dict>
+			<key>buildActionMask</key>
+			<string>2147483647</string>
+			<key>files</key>
+			<array>
+				<string>F05F138E1AC310CA00B02DEF</string>
+				<string>F05F138C1AC3109C00B02DEF</string>
+				<string>F0A4104A1916E7350046480F</string>
+			</array>
+			<key>isa</key>
+			<string>PBXResourcesBuildPhase</string>
+			<key>runOnlyForDeploymentPostprocessing</key>
+			<string>0</string>
+		</dict>
+		<key>F0A4103B1916E7350046480F</key>
+		<dict>
+			<key>buildConfigurationList</key>
+			<string>F0A4104E1916E7350046480F</string>
+			<key>buildPhases</key>
+			<array>
+				<string>0384BF0CC1176B74F29A8D53</string>
+				<string>F0A410381916E7350046480F</string>
+				<string>F0A410391916E7350046480F</string>
+				<string>F0A4103A1916E7350046480F</string>
+				<string>2CFD2F6054B74FDA9A82F2AB</string>
+			</array>
+			<key>buildRules</key>
+			<array/>
+			<key>dependencies</key>
+			<array/>
+			<key>isa</key>
+			<string>PBXNativeTarget</string>
+			<key>name</key>
+			<string>NTJsonStoreTests</string>
+			<key>productName</key>
+			<string>NTJsonStoreTests</string>
+			<key>productReference</key>
+			<string>F0A4103C1916E7350046480F</string>
+			<key>productType</key>
+			<string>com.apple.product-type.bundle.unit-test</string>
+		</dict>
+		<key>F0A4103C1916E7350046480F</key>
+		<dict>
+			<key>explicitFileType</key>
+			<string>wrapper.cfbundle</string>
+			<key>includeInIndex</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>NTJsonStoreTests.xctest</string>
+			<key>sourceTree</key>
+			<string>BUILT_PRODUCTS_DIR</string>
+		</dict>
+		<key>F0A4103D1916E7350046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F0A4103C1916E7350046480F</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Products</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A4103E1916E7350046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F0A410C2191704BF0046480F</string>
+				<string>F0A4103F1916E7350046480F</string>
+				<string>F0A410411916E7350046480F</string>
+				<string>F0A410431916E7350046480F</string>
+				<string>F8FB8BF83942B63AA56C4CB5</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Frameworks</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A4103F1916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>XCTest.framework</string>
+			<key>path</key>
+			<string>Library/Frameworks/XCTest.framework</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>F0A410401916E7350046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A4103F1916E7350046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A410411916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>Foundation.framework</string>
+			<key>path</key>
+			<string>Library/Frameworks/Foundation.framework</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>F0A410421916E7350046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A410411916E7350046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A410431916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>wrapper.framework</string>
+			<key>name</key>
+			<string>UIKit.framework</string>
+			<key>path</key>
+			<string>Library/Frameworks/UIKit.framework</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>F0A410441916E7350046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A410431916E7350046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A410451916E7350046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F0A410461916E7350046480F</string>
+				<string>F02A1348191A920000812515</string>
+				<string>F02A1349191A920000812515</string>
+				<string>F0A4104B1916E7350046480F</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>path</key>
+			<string>NTJsonStoreTests</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A410461916E7350046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F05F138D1AC310CA00B02DEF</string>
+				<string>F0A410471916E7350046480F</string>
+				<string>F0A410481916E7350046480F</string>
+				<string>F0A4104D1916E7350046480F</string>
+			</array>
+			<key>isa</key>
+			<string>PBXGroup</string>
+			<key>name</key>
+			<string>Supporting Files</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A410471916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.plist.xml</string>
+			<key>path</key>
+			<string>NTJsonStoreTests-Info.plist</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A410481916E7350046480F</key>
+		<dict>
+			<key>children</key>
+			<array>
+				<string>F0A410491916E7350046480F</string>
+			</array>
+			<key>isa</key>
+			<string>PBXVariantGroup</string>
+			<key>name</key>
+			<string>InfoPlist.strings</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A410491916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>text.plist.strings</string>
+			<key>name</key>
+			<string>en</string>
+			<key>path</key>
+			<string>en.lproj/InfoPlist.strings</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A4104A1916E7350046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A410481916E7350046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A4104B1916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.objc</string>
+			<key>path</key>
+			<string>NTJsonStoreTests.m</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A4104C1916E7350046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A4104B1916E7350046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F0A4104D1916E7350046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>sourcecode.c.h</string>
+			<key>path</key>
+			<string>NTJsonStoreTests-Prefix.pch</string>
+			<key>sourceTree</key>
+			<string>&lt;group&gt;</string>
+		</dict>
+		<key>F0A4104E1916E7350046480F</key>
+		<dict>
+			<key>buildConfigurations</key>
+			<array>
+				<string>F0A4104F1916E7350046480F</string>
+				<string>F0A410501916E7350046480F</string>
+			</array>
+			<key>defaultConfigurationIsVisible</key>
+			<string>0</string>
+			<key>defaultConfigurationName</key>
+			<string>Release</string>
+			<key>isa</key>
+			<string>XCConfigurationList</string>
+		</dict>
+		<key>F0A4104F1916E7350046480F</key>
+		<dict>
+			<key>baseConfigurationReference</key>
+			<string>E31781205FBB1A6373DDC09C</string>
+			<key>buildSettings</key>
+			<dict>
+				<key>ALWAYS_SEARCH_USER_PATHS</key>
+				<string>NO</string>
+				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+				<string>gnu++0x</string>
+				<key>CLANG_CXX_LIBRARY</key>
+				<string>libc++</string>
+				<key>CLANG_ENABLE_MODULES</key>
+				<string>YES</string>
+				<key>CLANG_ENABLE_OBJC_ARC</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
+				<key>COPY_PHASE_STRIP</key>
+				<string>NO</string>
+				<key>FRAMEWORK_SEARCH_PATHS</key>
+				<array>
+					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
+					<string>$(inherited)</string>
+					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
+				</array>
+				<key>GCC_C_LANGUAGE_STANDARD</key>
+				<string>gnu99</string>
+				<key>GCC_DYNAMIC_NO_PIC</key>
+				<string>NO</string>
+				<key>GCC_OPTIMIZATION_LEVEL</key>
+				<string>0</string>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>NTJsonStoreTests/NTJsonStoreTests-Prefix.pch</string>
+				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
+				<array>
+					<string>DEBUG=1</string>
+					<string>$(inherited)</string>
+				</array>
+				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
+				<string>NO</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
+				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
+				<string>YES_ERROR</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES_AGGRESSIVE</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_VARIABLE</key>
+				<string>YES</string>
+				<key>INFOPLIST_FILE</key>
+				<string>NTJsonStoreTests/NTJsonStoreTests-Info.plist</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>7.1</string>
+				<key>ONLY_ACTIVE_ARCH</key>
+				<string>YES</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>SDKROOT</key>
+				<string>iphoneos</string>
+				<key>WRAPPER_EXTENSION</key>
+				<string>xctest</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Debug</string>
+		</dict>
+		<key>F0A410501916E7350046480F</key>
+		<dict>
+			<key>baseConfigurationReference</key>
+			<string>255C472FBE6AAC9EC90CAFA0</string>
+			<key>buildSettings</key>
+			<dict>
+				<key>ALWAYS_SEARCH_USER_PATHS</key>
+				<string>NO</string>
+				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
+				<string>gnu++0x</string>
+				<key>CLANG_CXX_LIBRARY</key>
+				<string>libc++</string>
+				<key>CLANG_ENABLE_MODULES</key>
+				<string>YES</string>
+				<key>CLANG_ENABLE_OBJC_ARC</key>
+				<string>YES</string>
+				<key>CLANG_WARN_BOOL_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN_EMPTY_BODY</key>
+				<string>YES</string>
+				<key>CLANG_WARN_ENUM_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_INT_CONVERSION</key>
+				<string>YES</string>
+				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
+				<string>YES_ERROR</string>
+				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
+				<string>YES</string>
+				<key>COPY_PHASE_STRIP</key>
+				<string>YES</string>
+				<key>ENABLE_NS_ASSERTIONS</key>
+				<string>NO</string>
+				<key>FRAMEWORK_SEARCH_PATHS</key>
+				<array>
+					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
+					<string>$(inherited)</string>
+					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
+				</array>
+				<key>GCC_C_LANGUAGE_STANDARD</key>
+				<string>gnu99</string>
+				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
+				<string>YES</string>
+				<key>GCC_PREFIX_HEADER</key>
+				<string>NTJsonStoreTests/NTJsonStoreTests-Prefix.pch</string>
+				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
+				<string>YES</string>
+				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
+				<string>YES_ERROR</string>
+				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
+				<string>YES_AGGRESSIVE</string>
+				<key>GCC_WARN_UNUSED_FUNCTION</key>
+				<string>YES</string>
+				<key>GCC_WARN_UNUSED_VARIABLE</key>
+				<string>YES</string>
+				<key>INFOPLIST_FILE</key>
+				<string>NTJsonStoreTests/NTJsonStoreTests-Info.plist</string>
+				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
+				<string>7.1</string>
+				<key>PRODUCT_NAME</key>
+				<string>$(TARGET_NAME)</string>
+				<key>SDKROOT</key>
+				<string>iphoneos</string>
+				<key>VALIDATE_PRODUCT</key>
+				<string>YES</string>
+				<key>WRAPPER_EXTENSION</key>
+				<string>xctest</string>
+			</dict>
+			<key>isa</key>
+			<string>XCBuildConfiguration</string>
+			<key>name</key>
+			<string>Release</string>
+		</dict>
+		<key>F0A410C2191704BF0046480F</key>
+		<dict>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>lastKnownFileType</key>
+			<string>compiled.mach-o.dylib</string>
+			<key>name</key>
+			<string>libsqlite3.dylib</string>
+			<key>path</key>
+			<string>Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libsqlite3.dylib</string>
+			<key>sourceTree</key>
+			<string>DEVELOPER_DIR</string>
+		</dict>
+		<key>F0A410C3191704BF0046480F</key>
+		<dict>
+			<key>fileRef</key>
+			<string>F0A410C2191704BF0046480F</string>
+			<key>isa</key>
+			<string>PBXBuildFile</string>
+		</dict>
+		<key>F8FB8BF83942B63AA56C4CB5</key>
+		<dict>
+			<key>explicitFileType</key>
+			<string>archive.ar</string>
+			<key>includeInIndex</key>
+			<string>0</string>
+			<key>isa</key>
+			<string>PBXFileReference</string>
+			<key>path</key>
+			<string>libPods-NTJsonStoreTests.a</string>
+			<key>sourceTree</key>
+			<string>BUILT_PRODUCTS_DIR</string>
+		</dict>
+	</dict>
+	<key>rootObject</key>
+	<string>F0A410321916E7200046480F</string>
+</dict>
+</plist>
