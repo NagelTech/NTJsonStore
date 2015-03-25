@@ -51,21 +51,21 @@ The remaining methods (in adition to `find`) shouldn't surprise you:
  - `insert` - Inserts the passed JSON into the collection. The new rowid is returned. Note the original JSON is not modified, but when you read it back the `__rowid__` key will always be populated.
  - `insertBatch` - Insert mutiple items in a single transaction. If any insert fails, no changes will be made.
  - `update` - Update an existing JSON document. The passed JSON *must* have the `__rowid__` key populated. (All JSON values returned from the system will have this pre-populated.)
-  - `remove` - Remove a single item from the collection. The passed JSON *must* have the `__rowid__` key populated.
-  - `removeWhere` - Remove multiple items from the collection.
+ - `remove` - Remove a single item from the collection. The passed JSON *must* have the `__rowid__` key populated.
+ - `removeWhere` - Remove multiple items from the collection.
   
 Additionally there are methods to [configure](#configuration) each collection and [synchronize](#threading-and-synchronization) queues.
 
 ## [Configuration](id:configuration)
 ---
 
-The Store encapsulates the database and allows access to the array of collections. The `storePath` defaults to the caches directory and the `storeName	 defaults to 'NTJsonStore.db'. These properties can be change any time before the store is first accessed.
+The Store encapsulates the database and allows access to the array of collections. The `storePath` defaults to the caches directory and the `storeName` defaults to 'NTJsonStore.db'. These properties can be change any time before the store is first accessed.
 
 There are several configuration settings for each collection:
     
  - **Indexes.** The system supports both unique an non-unique indexes. Add a unique index with `-addUniqueIndexWithKeys` or a non-uniue index with `-addIndexWithKeys:`. In both cases the "keys" is a single string with a comma-separated list of fields to be indexed. Each field *must* be enclosed in square braces. Additionally you may append `DESC` or `ASC` to any field to define the sort order.
 
-  - **Queryable Fields.** Queryable fields tells the systems the fields you plan on using. If you make this call when the collection is empty it is very low cost. (Once there are records the system will extract the field from each JSON record and create columns for you.) The `-addQueryableFields:` message accepts a comma-separated list of field names, *each enclosed in square braces*. This call is totally optional and is used to improve performance -- if you use a field that has not been materialized the system will do transparently for you.
+ - **Queryable Fields.** Queryable fields tells the systems the fields you plan on using. If you make this call when the collection is empty it is very low cost. (Once there are records the system will extract the field from each JSON record and create columns for you.) The `-addQueryableFields:` message accepts a comma-separated list of field names, *each enclosed in square braces*. This call is totally optional and is used to improve performance -- if you use a field that has not been materialized the system will do transparently for you.
 
  - **Default JSON.** The defauls JSON defines default values for fields when performing queries. 
  
@@ -110,7 +110,7 @@ Additionally, the `NTJsonStore` has synchronization methods that allow you to sy
 
 By default the system maintains two caches for each collection:
  - *In use items.* Some magic is used in the background to determine if a JSON document s still in use by the application (a reference count is maintained) For these items, the same value is always returned.
-  - *Cached items.* Once items fall out of the "in use" cache, they are collected into an LRU cache. By default, 50 entries are maintained in the cache
+ - *Cached items.* Once items fall out of the "in use" cache, they are collected into an LRU cache. By default, 50 entries are maintained in the cache
   
 Set the `cacheSize` to a positive value to set the size of the LRU cache or 0 to disable it. Set `cacheSize` to -1 to disable all caching, including in use item caching.
 

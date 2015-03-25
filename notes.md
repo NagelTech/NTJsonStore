@@ -3,8 +3,6 @@ To Do 1.0
 
  - documentation
 
- - sample application (freebase?)
-
  - General thread safety validation pass
 
  - Consider removing NTJsonDictionary all together in favor of plain vanilla NSDictionaries. (May impact cache performance.)
