@@ -11,6 +11,7 @@ To Do 1.0
 
  - Investigate multi-process access to Stores (iOS 8 extensions.) Do we need to use (or enable) a NSFileCoordinator to manage the cache? Does SQLITE work multi-process already? Can we add a presenter for the existing sqlite file? Maybe not? http://www.atomicbird.com/blog/sharing-with-app-extensions
 
+ - Even if sqlite can handle multi-process stores, we need to deal with cache invalidation between processes somehow.
 
 
 To Do Later Versions
