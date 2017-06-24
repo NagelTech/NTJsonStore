@@ -69,7 +69,7 @@ There are several configuration settings for each collection:
 
  - **Default JSON.** The defauls JSON defines default values for fields when performing queries. 
  
- - **Cache Size.** The system caches JSON results for you to minimize the overhead of parsing the JSON our of the data store as well as to reduce your memory footprint (by returning the same `NSDictionary` each time it is requested.) By default the system will track objects that are in use by your application (using some reference counting magic) and will cache up to 0 additional items. `setCacheSize:` is used to change the default, setting it to 0 will only track in use items while -1 will disable all caching so a new object is returned each time. Any other value inidcates the cache size. You can also flush the cache by calling `-flushCache`
+ - **Cache Size.** The system caches JSON results for you to minimize the overhead of parsing the JSON our of the data store as well as to reduce your memory footprint (by returning the same `NSDictionary` each time it is requested.) By default the system will track objects that are in use by your application (using some reference counting magic) and will cache up to 50 additional items. `setCacheSize:` is used to change the default, setting it to 0 will only track in use items while -1 will disable all caching so a new object is returned each time. Any other value inidcates the cache size. You can also flush the cache by calling `-flushCache`
  
  - **Aliases.** Aliases are essentially macros that are maintained per collection. They are a great way to map model object property names to JSON fields in queries. For instance, you might have a JSON field such as `[user.first_name]` that unltimately maps to a model object property `firstName`.
 

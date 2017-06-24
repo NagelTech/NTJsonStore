@@ -436,7 +436,7 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
                  if (!errors )
                      errors = [NSMutableArray array];
                  
-                 [errors addObject:errors];
+                 [errors addObject:error];
              }
          }];
     }

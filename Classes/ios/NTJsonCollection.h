@@ -49,7 +49,7 @@
 -(void)addUniqueIndexWithKeys:(NSString *)keys;
 
 /// Ensure that the passed JSON paths are queryable. This is a performance optionization and is optional. If queryable fields are pre-declared they will be added the first time they are used in a query.
-/// @param keys a comma-separated list of JSON paths paths.
+/// @param fields a comma-separated list of JSON paths paths.
 -(void)addQueryableFields:(NSString *)fields;
 
 /// replace any aliases in string with the values from self.aliases. Useful for testing.
@@ -337,7 +337,6 @@
 /**
  *  Returns the count of items in the collection.
  *
- *  @param error             a pointer to the error which is set on failure (-1 is returned). May be nil.
  *  @return                  the count of items or -1 on error (self.error is set)
  */
 -(int)count;

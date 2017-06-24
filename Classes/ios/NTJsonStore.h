@@ -74,7 +74,6 @@
 
 /// ensure all pending schema changes for all collections have been committed to the data store. Changes to indexes, queryable fields and
 /// defaults will all be written when this call completes. Any errors encountered are returned an array upon completion.
-/// @param completionHandler the completionHandler to run on completion. May not be nil. The completionHandler is run on the UI thread if the call is made
 /// @returns nil on success or an array of NSErrors encountered.
 -(NSArray *)ensureSchema;
 

@@ -111,7 +111,7 @@ static const int DEFAULT_CACHE_SIZE = 50;
         cacheItem.isInUse = NO;
         [_cachedItems addObject:cacheItem]; // newest are at end of the list.
 
-        if ( !_cachedItems.count > _cacheSize )
+        if ( _cachedItems.count <= _cacheSize )
             [self purgeCacheWithFlushAll:NO];
     });
 }
