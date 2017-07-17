@@ -319,12 +319,6 @@
     
     // todo: there are two ways to look at moves and either strategy could be right.
     // we need to make another pass and figure if we can make moves simpler by inverting them
-    
-    // for now, we always validate our results...
-    
-    NSArray *newItemsValidation = [self applyChanges:changes oldItems:oldItems];
-    
-    NSAssert([newItems isEqualToArray:newItemsValidation], @"getChanges2 failed");
 
     return [changes copy];
 }
@@ -359,5 +353,14 @@
     
     return [newItems copy];
 }
+
+
+- (BOOL)validateChanges
+{
+    NSArray *newItems = [self.class applyChanges:self.changes oldItems:self.oldItems];
+    
+    return [self.items isEqualToArray:newItems];
+}
+
 
 @end

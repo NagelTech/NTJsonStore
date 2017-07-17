@@ -226,6 +226,71 @@
 }
 
 
+-(void)testChangeSets
+{
+    NSMutableArray<NSDictionary *> *originalItems = [NSMutableArray arrayWithCapacity:100];
+    
+    for(NSInteger index=0; index<100; index++)
+        [originalItems addObject:@{NTJsonRowIdKey: @(index), @"data": [NSString stringWithFormat:@"Item #%td", index]}];
+    
+    for(int round=1; round<=100; round++)
+    {
+        NSArray<NSDictionary *> *oldItems = [originalItems copy];
+        NSMutableArray<NSDictionary *> *newItems = [oldItems mutableCopy];
+        
+        int numChanges = arc4random() % 20;
+        
+        for(int change=1; change<=numChanges; change++)
+        {
+            NTJsonChangeSetAction action = arc4random() % 4;
+            NSInteger index = arc4random() % newItems.count;
+        
+            switch(action)
+            {
+                    
+                case NTJsonChangeSetActionDelete:
+                    [newItems removeObjectAtIndex:index];
+                    break;
+                    
+                case NTJsonChangeSetActionUpdate:
+                {
+                    NSMutableDictionary *item = [newItems[index] mutableCopy];
+                    item[@"data"] = [NSString stringWithFormat:@"Update %d.%d", round, change];
+                    newItems[index] = [item copy];
+                    break;
+                }
+                    
+                case NTJsonChangeSetActionInsert:
+                {
+                    NSDictionary *item = @{NTJsonRowIdKey: @(round*100 + change), @"data": [NSString stringWithFormat:@"Insert %d.%d", round, change]};
+                    [newItems insertObject:item atIndex:index];
+                    break;
+                }
+                    
+                case NTJsonChangeSetActionMove:
+                {
+                    NSDictionary *item = newItems[index];
+                    [newItems removeObjectAtIndex:index];
+                    
+                    NSInteger index2 = arc4random() % newItems.count;
+                    [newItems insertObject:item atIndex:index2];
+                    break;
+                }
+            }
+        } // for change
+        
+        // now, validate...
+        
+        NTJsonChangeSet *changeSet = [[NTJsonChangeSet alloc] initWithOldItems:oldItems newItems:newItems];
+        
+        BOOL isValid = [changeSet validateChanges];
+        
+        if (!isValid)
+            XCTAssert(isValid, @"changeSet failed validation");
+        
+    }
+}
+
 -(void)testLiveQueries
 {
     NSDictionary *data1 = @{@"uid": @(1), @"name": @"One", @"is_odd": @(YES)};

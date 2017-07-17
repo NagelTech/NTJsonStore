@@ -40,6 +40,8 @@ typedef NS_ENUM(NSInteger, NTJsonChangeSetAction)
 
 - (instancetype)initWithOldItems:(NSArray<NSDictionary *> *)oldItems newItems:(NSArray<NSDictionary *> *)newItems;
 
+- (BOOL)validateChanges;
+
 @end
 
 @interface NTJsonChangeSetChange(Private)
