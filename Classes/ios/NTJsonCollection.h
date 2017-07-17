@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import "NTJsonStoreTypes.h"
+#import "NTJsonLiveQuery.h"
 
 
 @class NTJsonStore;
@@ -662,6 +663,10 @@
  *  @return the name of the collection.
  */
 -(NSString *)description;
+
+-(NTJsonLiveQuery *)liveQueryWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit;
+
+- (BOOL)pushChanges;
 
 @end
 

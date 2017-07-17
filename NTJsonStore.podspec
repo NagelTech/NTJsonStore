@@ -13,5 +13,7 @@ Pod::Spec.new do |s|
   s.source_files        = 'classes/ios/*.{h,m}'
   s.public_header_files = 'classes/ios/NTJsonStore.h',
                           'classes/ios/NTJsonCollection.h',
-                          'classes/ios/NTJsonStoreTypes.h'
+                          'classes/ios/NTJsonStoreTypes.h',
+                          'classes/ios/NTJsonChangeSet.h',
+                          'classes/ios/NTJsonLiveQuery.h'
 end

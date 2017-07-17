@@ -30,6 +30,8 @@
     
     NSMutableArray *_pendingColumns;
     NSMutableArray *_pendingIndexes;
+    
+    NSMutableArray<NTJsonLiveQuery *> *_liveQueries;
 }
 
 @property (nonatomic,readonly) NTJsonSqlConnection *connection;
@@ -60,6 +62,7 @@
         _pendingIndexes = [NSMutableArray array];
         _connection = [[NTJsonSqlConnection alloc] initWithFilename:store.storeFilename connectionName:self.name];
         _objectCache = [[NTJsonObjectCache alloc] initWithDeallocQueue:_connection.queue];
+        _liveQueries = [NSMutableArray array];
     }
 
     return self;
@@ -887,6 +890,22 @@
     }
 }
 
++(void)enumerateFieldsInSql:(NSString *)sql block:(void (^)(NSString *fieldName, BOOL *stop))block
+{
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[.+?\\]" options:0 error:nil];
+    
+    [regex enumerateMatchesInString:sql options:0 range:NSMakeRange(0, sql.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+        NSString *fieldName = [sql substringWithRange:result.range];
+                             
+        if ( [fieldName hasPrefix:@"["] )
+            fieldName = [fieldName substringFromIndex:1];
+                             
+        if ( [fieldName hasSuffix:@"]"] )
+            fieldName = [fieldName substringToIndex:fieldName.length-1];
+                             
+         block(fieldName, stop);
+    }];
+}
 
 -(BOOL)scanSqlForNewColumns:(NSString *)sql     // returns YES if new columns were found
 {
@@ -895,42 +914,27 @@
     
     __block BOOL newColumnsAdded = NO;
     
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\[.+?\\]" options:0 error:nil];
-    
-    [regex enumerateMatchesInString:sql
-                            options:0
-                              range:NSMakeRange(0, sql.length)
-                         usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
-        NSString *columnName = [sql substringWithRange:result.range];
-        
-        // massage the column name a bit...
-        
-        if ( [columnName hasPrefix:@"["] )
-            columnName = [columnName substringFromIndex:1];
-        
-        if ( [columnName hasSuffix:@"]"] )
-            columnName = [columnName substringToIndex:columnName.length-1];
-        
+    [self.class enumerateFieldsInSql:sql block:^(NSString *fieldName, BOOL *stop) {
         // Ignore our row id, it's always available...
         
-        if ( [columnName isEqualToString:NTJsonRowIdKey] )
+        if ( [fieldName isEqualToString:NTJsonRowIdKey] )
             return ;
         
         // check existing column list...
         
-        NTJsonColumn *column = [self.columns NTJsonStore_find:^BOOL(NTJsonColumn *column) { return [column.name isEqualToString:columnName]; }];
+        NTJsonColumn *column = [self.columns NTJsonStore_find:^BOOL(NTJsonColumn *column) { return [column.name isEqualToString:fieldName]; }];
         
         // and pending columns...
         
         if ( !column )
-            column = [_pendingColumns NTJsonStore_find:^BOOL(NTJsonColumn *column) { return [column.name isEqualToString:columnName]; }];
+            column = [_pendingColumns NTJsonStore_find:^BOOL(NTJsonColumn *column) { return [column.name isEqualToString:fieldName]; }];
         
         if ( column )
             return ;    // found this column
         
         // We have a new column, add to pending list...
         
-        column = [NTJsonColumn columnWithName:columnName];
+        column = [NTJsonColumn columnWithName:fieldName];
         
         [_pendingColumns addObject:column];
         
@@ -1114,6 +1118,27 @@
     
     NTJsonRowId rowid = sqlite3_last_insert_rowid(self.connection.db);
     
+    // save the JSON to the cache...
+    
+    if (_liveQueries.count > 0 || _objectCache)
+    {
+        // todo: issue with insert batch & rollbacks here if we add it to the cache...
+        
+        NSMutableDictionary *mutableJson = [json mutableCopy];
+        mutableJson[NTJsonRowIdKey] = @(rowid);
+        json = [mutableJson copy];
+        
+        if (_objectCache)
+            json = [_objectCache addJson:json withRowId:rowid];
+    }
+    
+    // notify live queries...
+    
+    if (_liveQueries.count > 0)
+    {
+        [self itemWasInserted:json];
+    }
+    
     return rowid;
 }
 
@@ -1273,7 +1298,12 @@
     BOOL success = [self.connection execSql:sql args:values];
     
     if ( success )
+    {
         [_objectCache addJson:json withRowId:rowid];
+    
+        if (_liveQueries.count > 0)
+            [self itemWasUpdated:json];
+    }
     
     return success;
 }
@@ -1333,7 +1363,12 @@
     BOOL success = [self.connection execSql:[NSString stringWithFormat:@"DELETE FROM [%@] WHERE [%@] = ?", self.name, NTJsonRowIdKey] args:@[@(rowid)]];
     
     if ( success )
+    {
         [_objectCache removeObjectWithRowId:rowid];
+        
+        if (_liveQueries.count > 0)
+            [self itemWasDeleted:json];
+    }
     
     return success;
 }
@@ -1677,6 +1712,9 @@
     // note: we may leave objects in the cache that were deleted, but the rowid will not be re-used (thanks to AUTOINCREMENT PK)
     // so it should be eventually cleaned out of the cache from lack of use.
     
+    if (count > 0)
+        [self collectionWasChanged]; // we don't know what records were changed
+    
     return count;
 }
 
@@ -1781,6 +1819,88 @@
 -(void)sync
 {
     [self syncWait:DISPATCH_TIME_FOREVER];
+}
+
+
+#pragma mark - live query
+
+
+-(void)notifyLiveQueries:(void (^)(NTJsonLiveQuery *liveQuery))block
+{
+    if (_liveQueries.count == 0)
+        return;
+    
+    [_liveQueries enumerateObjectsUsingBlock:^(NTJsonLiveQuery * liveQuery, NSUInteger idx, BOOL * _Nonnull stop) {
+        block(liveQuery);
+    }];
+}
+
+- (void)collectionWasChanged
+{
+    [self notifyLiveQueries:^(NTJsonLiveQuery *liveQuery) {
+        [liveQuery collectionWasChanged];
+    }];
+}
+
+
+-(void)itemWasUpdated:(NSDictionary *)item
+{
+    [self notifyLiveQueries:^(NTJsonLiveQuery *liveQuery) {
+        [liveQuery itemWasUpdated:item];
+    }];
+}
+
+
+-(void)itemWasInserted:(NSDictionary *)item
+{
+    [self notifyLiveQueries:^(NTJsonLiveQuery *liveQuery) {
+        [liveQuery itemWasInserted:item];
+    }];
+}
+
+
+-(void)itemWasDeleted:(NSDictionary *)item
+{
+    [self notifyLiveQueries:^(NTJsonLiveQuery *liveQuery) {
+        [liveQuery itemWasDeleted:item];
+    }];
+}
+
+
+- (NTJsonLiveQuery *)liveQueryWhere:(NSString *)where args:(NSArray *)args orderBy:(NSString *)orderBy limit:(int)limit
+{
+    where = [self replaceAliasesIn:where cacheable:YES];
+    orderBy = [self replaceAliasesIn:orderBy cacheable:YES];
+    
+    [self scanSqlForNewColumns:where];
+    [self scanSqlForNewColumns:orderBy];
+    
+    if ( ![self ensureSchema] )
+        return nil;
+    
+    NTJsonLiveQuery *liveQuery = [[NTJsonLiveQuery alloc] initWithCollection:self where:where args:args orderBy:orderBy limit:limit];
+    
+    [_liveQueries addObject:liveQuery];
+    
+    return liveQuery;
+}
+
+
+-(void)closeLiveQuery:(NTJsonLiveQuery *)liveQuery
+{
+    [_liveQueries removeObject:liveQuery];
+}
+
+
+- (BOOL)pushChanges
+{
+    __block BOOL didChange = NO;
+    
+    [_liveQueries enumerateObjectsUsingBlock:^(NTJsonLiveQuery *liveQuery, NSUInteger idx, BOOL *stop) {
+        didChange |= [liveQuery pushChanges];
+    }];
+    
+    return didChange;
 }
 
 

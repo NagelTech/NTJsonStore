@@ -127,5 +127,7 @@
 /// operation that requires several operations across collections to be completed first. This method will block until all pending operations have been completed.
 -(void)sync;
 
+-(BOOL)pushChanges;
+
 @end
 

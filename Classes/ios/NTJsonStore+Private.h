@@ -14,6 +14,8 @@
 
 #import "NTJsonStore.h"
 
+#import "NTJsonChangeSet.h"
+#import "NTJsonLiveQuery.h"
 #import "NTJsonCollection+Private.h"
 #import "NTJsonColumn+Private.h"
 #import "NTJsonIndex+Private.h"
@@ -24,7 +26,7 @@
 
 #define LOG(format, ...)            NSLog(format, ##__VA_ARGS__)
 #define LOG_ERROR(format, ...)      NSLog(@"Error: " format, ##__VA_ARGS__)
-#define LOG_DBG(format, ...)      NSLog(@"Debug: " format, ##__VA_ARGS__)
+#define LOG_DBG(format, ...)        NSLog(@"Debug: " format, ##__VA_ARGS__)
 
 
 extern NSString *NTJsonStore_MetadataTableName;

@@ -24,4 +24,8 @@
 
 -(void)close;
 
+-(void)closeLiveQuery:(NTJsonLiveQuery *)liveQuery;
+
++(void)enumerateFieldsInSql:(NSString *)sql block:(void (^)(NSString *fieldName, BOOL *stop))block;
+
 @end

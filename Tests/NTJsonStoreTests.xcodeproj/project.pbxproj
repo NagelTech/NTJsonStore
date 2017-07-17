@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		289493FE0544586A2FA64087 /* libPods-NTJsonStoreTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F8FB8BF83942B63AA56C4CB5 /* libPods-NTJsonStoreTests.a */; };
+		7314C3271D2079B4D5F656BD /* libPods-NTJsonStoreTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E71257AAB87F350E8F14275B /* libPods-NTJsonStoreTests.a */; };
 		F02A134A191A920000812515 /* BaseTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = F02A1349191A920000812515 /* BaseTestCase.m */; };
 		F05F138C1AC3109C00B02DEF /* NTJsonStore in Resources */ = {isa = PBXBuildFile; fileRef = F05F138B1AC3109C00B02DEF /* NTJsonStore */; };
 		F05F138E1AC310CA00B02DEF /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = F05F138D1AC310CA00B02DEF /* Podfile */; };
@@ -20,8 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		255C472FBE6AAC9EC90CAFA0 /* Pods-NTJsonStoreTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NTJsonStoreTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.release.xcconfig"; sourceTree = "<group>"; };
-		E31781205FBB1A6373DDC09C /* Pods-NTJsonStoreTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NTJsonStoreTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.debug.xcconfig"; sourceTree = "<group>"; };
+		10A3F47AD5DE9465EAFCD498 /* Pods-NTJsonStoreTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NTJsonStoreTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B18D8E48B04107B3936D2BAA /* Pods-NTJsonStoreTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NTJsonStoreTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests.release.xcconfig"; sourceTree = "<group>"; };
+		E71257AAB87F350E8F14275B /* libPods-NTJsonStoreTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NTJsonStoreTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F02A1348191A920000812515 /* BaseTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseTestCase.h; sourceTree = "<group>"; };
 		F02A1349191A920000812515 /* BaseTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseTestCase.m; sourceTree = "<group>"; };
 		F05F138B1AC3109C00B02DEF /* NTJsonStore */ = {isa = PBXFileReference; lastKnownFileType = folder; name = NTJsonStore; path = ..; sourceTree = "<group>"; };
@@ -35,7 +36,6 @@
 		F0A4104B1916E7350046480F /* NTJsonStoreTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NTJsonStoreTests.m; sourceTree = "<group>"; };
 		F0A4104D1916E7350046480F /* NTJsonStoreTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NTJsonStoreTests-Prefix.pch"; sourceTree = "<group>"; };
 		F0A410C2191704BF0046480F /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
-		F8FB8BF83942B63AA56C4CB5 /* libPods-NTJsonStoreTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NTJsonStoreTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,18 +47,18 @@
 				F0A410401916E7350046480F /* XCTest.framework in Frameworks */,
 				F0A410441916E7350046480F /* UIKit.framework in Frameworks */,
 				F0A410421916E7350046480F /* Foundation.framework in Frameworks */,
-				289493FE0544586A2FA64087 /* libPods-NTJsonStoreTests.a in Frameworks */,
+				7314C3271D2079B4D5F656BD /* libPods-NTJsonStoreTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0CDD1F470C32FA264A7983A6 /* Pods */ = {
+		1CEB72659580D2B3D40C17A4 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				E31781205FBB1A6373DDC09C /* Pods-NTJsonStoreTests.debug.xcconfig */,
-				255C472FBE6AAC9EC90CAFA0 /* Pods-NTJsonStoreTests.release.xcconfig */,
+				10A3F47AD5DE9465EAFCD498 /* Pods-NTJsonStoreTests.debug.xcconfig */,
+				B18D8E48B04107B3936D2BAA /* Pods-NTJsonStoreTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -70,7 +70,7 @@
 				F0A410451916E7350046480F /* NTJsonStoreTests */,
 				F0A4103E1916E7350046480F /* Frameworks */,
 				F0A4103D1916E7350046480F /* Products */,
-				0CDD1F470C32FA264A7983A6 /* Pods */,
+				1CEB72659580D2B3D40C17A4 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -89,7 +89,7 @@
 				F0A4103F1916E7350046480F /* XCTest.framework */,
 				F0A410411916E7350046480F /* Foundation.framework */,
 				F0A410431916E7350046480F /* UIKit.framework */,
-				F8FB8BF83942B63AA56C4CB5 /* libPods-NTJsonStoreTests.a */,
+				E71257AAB87F350E8F14275B /* libPods-NTJsonStoreTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -123,11 +123,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F0A4104E1916E7350046480F /* Build configuration list for PBXNativeTarget "NTJsonStoreTests" */;
 			buildPhases = (
-				0384BF0CC1176B74F29A8D53 /* Check Pods Manifest.lock */,
+				93C4C543A9CE23D7C4CC0B5B /* [CP] Check Pods Manifest.lock */,
 				F0A410381916E7350046480F /* Sources */,
 				F0A410391916E7350046480F /* Frameworks */,
 				F0A4103A1916E7350046480F /* Resources */,
-				2CFD2F6054B74FDA9A82F2AB /* Copy Pods Resources */,
+				B0169CD9BCD73F6929364E17 /* [CP] Embed Pods Frameworks */,
+				6263E3004F065AAF7ED2F3C0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -177,34 +178,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0384BF0CC1176B74F29A8D53 /* Check Pods Manifest.lock */ = {
+		6263E3004F065AAF7ED2F3C0 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		2CFD2F6054B74FDA9A82F2AB /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		93C4C543A9CE23D7C4CC0B5B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		B0169CD9BCD73F6929364E17 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-NTJsonStoreTests/Pods-NTJsonStoreTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -249,7 +265,7 @@
 		};
 		F0A4104F1916E7350046480F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E31781205FBB1A6373DDC09C /* Pods-NTJsonStoreTests.debug.xcconfig */;
+			baseConfigurationReference = 10A3F47AD5DE9465EAFCD498 /* Pods-NTJsonStoreTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -297,7 +313,7 @@
 		};
 		F0A410501916E7350046480F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 255C472FBE6AAC9EC90CAFA0 /* Pods-NTJsonStoreTests.release.xcconfig */;
+			baseConfigurationReference = B18D8E48B04107B3936D2BAA /* Pods-NTJsonStoreTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";

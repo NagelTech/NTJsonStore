@@ -194,7 +194,123 @@
         
         XCTAssert([parsed isEqualToString:expected], @"Alias parsing failed. input \"%@\", expected \"%@\", actual \"%@\"", string, expected, parsed);
     }
+}
+
+
+-(void)tryLiveQueryWithCollection:(NTJsonCollection *)collection Action:(void (^)())action validation:(void (^)(NTJsonChangeSet *))validation
+{
+    NTJsonLiveQuery *liveQuery = [collection liveQueryWhere:@"LENGTH([name]) == 3" args:nil orderBy:@"[uid]" limit:-1];
     
+    action();
+    
+    [liveQuery addSubscriber:^(NTJsonChangeSet *changeSet) {
+        validation(changeSet);
+    }];
+    
+    BOOL changed = [collection pushChanges];
+    XCTAssert(changed, @"changes not detected");
+    
+    [liveQuery close];
+}
+
+
++(NSArray *)filterArray:(NSArray *)array withIndexSet:(NSIndexSet *)indexSet
+{
+    NSMutableArray *result = [NSMutableArray array];
+    
+    [indexSet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        [result addObject:array[idx]];
+    }];
+    
+    return [result copy];
+}
+
+
+-(void)testLiveQueries
+{
+    NSDictionary *data1 = @{@"uid": @(1), @"name": @"One", @"is_odd": @(YES)};
+    NSDictionary *data2 = @{@"uid": @(2), @"name": @"Two", @"is_odd": @(NO)};
+    NSDictionary *data3 = @{@"uid": @(3), @"name": @"Three", @"is_odd": @(YES)};
+    NSDictionary *data4 = @{@"uid": @(4), @"name": @"Four"};
+    NSDictionary *data5 = @{@"uid": @(5), @"name": @"Five", @"is_odd": @(YES)};
+    NSDictionary *data6 = @{@"uid": @(6), @"name": @"Six"};
+    
+    NTJsonCollection *collection1 = [self.store collectionWithName:@"collection1"];
+    
+    [collection1 insert:data1];
+    [collection1 insert:data6];
+    
+    // test insert
+    
+    [self tryLiveQueryWithCollection:collection1 Action:^{
+        [collection1 insert:data2];
+        [collection1 insert:data3];
+        [collection1 insert:data4];
+        [collection1 insert:data5];
+    } validation:^(NTJsonChangeSet *changeSet) {
+        NSArray *initialItems = @[data1, data6];
+        NSArray *newItems = @[data1, data2, data6];
+        NSArray *expectedChanges = @[[NTJsonChangeSetChange insertWithNewIndex:1 item:data2]];
+        
+        [self compareExpectedItems:initialItems actualItems:changeSet.oldItems operation:@"changeSet oldItems invalid"];
+        [self compareExpectedItems:newItems actualItems:changeSet.items operation:@"changeSet items invalid"];
+        XCTAssert([changeSet.changes isEqualToArray:expectedChanges], @"changes invalid for insert");
+    }];
+    
+    // test delete...
+    
+    [self tryLiveQueryWithCollection:collection1 Action:^{
+        NSDictionary *itemToDelete = [collection1 findOneWhere:@"[uid] = 1" args:nil];
+        XCTAssert(itemToDelete, @"unable to find itemToDelete");
+        
+        XCTAssert([collection1 remove:itemToDelete] == 1, @"unable to delete item");
+    } validation:^(NTJsonChangeSet *changeSet) {
+        NSArray *initialItems = @[data1, data2, data6];
+        NSArray *newItems = @[data2, data6];
+        NSArray *expectedChanges = @[[NTJsonChangeSetChange deleteWithOldIndex:0 item:data1]];
+        
+        [self compareExpectedItems:initialItems actualItems:changeSet.oldItems operation:@"changeSet oldItems invalid"];
+        [self compareExpectedItems:newItems actualItems:changeSet.items operation:@"changeSet items invalid"];
+        XCTAssert([changeSet.changes isEqualToArray:expectedChanges], @"changes invalid for delete");
+    }];
+    
+    // test update...
+    
+    NSMutableDictionary *itemToUpdate = [[collection1 findOneWhere:@"[uid] = 2" args:nil] mutableCopy];
+    XCTAssert(itemToUpdate, @"couldn't find item to update");
+    itemToUpdate[@"name"] = @"TWO";
+    
+    [self tryLiveQueryWithCollection:collection1 Action:^{
+        XCTAssert([collection1 update:itemToUpdate], @"couldn't update item");
+    } validation:^(NTJsonChangeSet *changeSet) {
+        NSArray *initialItems = @[data2, data6];
+        NSArray *newItems = @[itemToUpdate, data6];
+        NSArray *expectedChanges = @[[NTJsonChangeSetChange updateWithOldIndex:0 newIndex:0 item:itemToUpdate]];
+        
+        [self compareExpectedItems:initialItems actualItems:changeSet.oldItems operation:@"changeSet oldItems invalid"];
+        [self compareExpectedItems:newItems actualItems:changeSet.items operation:@"changeSet items invalid"];
+        
+        XCTAssert([changeSet.changes isEqualToArray:expectedChanges], @"changes invalid for update");
+    }];
+    
+    // test move...
+    
+    NSMutableDictionary *itemToUpdate2 = [itemToUpdate mutableCopy];
+    itemToUpdate2[@"uid"] = @(100);
+    
+    [self tryLiveQueryWithCollection:collection1 Action:^{
+        XCTAssert([collection1 update:itemToUpdate2], @"couldn't update item");
+    } validation:^(NTJsonChangeSet *changeSet) {
+        NSArray *initialItems = @[itemToUpdate, data6];
+        NSArray *newItems = @[data6, itemToUpdate2];
+        NSArray *expectedChanges = @[[NTJsonChangeSetChange moveWithOldIndex:1 newIndex:0 item:data6],
+                                     [NTJsonChangeSetChange updateWithOldIndex:0 newIndex:1 item:itemToUpdate2]];
+        
+        [self compareExpectedItems:initialItems actualItems:changeSet.oldItems operation:@"changeSet oldItems invalid"];
+        [self compareExpectedItems:newItems actualItems:changeSet.items operation:@"changeSet items invalid"];
+        
+        XCTAssert([changeSet.changes isEqualToArray:expectedChanges], @"changes invalid for move");
+    }];
 }
 
 

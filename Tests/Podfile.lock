@@ -1,5 +1,5 @@
 PODS:
-  - NTJsonStore (0.20)
+  - NTJsonStore (1.00)
 
 DEPENDENCIES:
   - NTJsonStore (from `../`)
@@ -9,6 +9,8 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  NTJsonStore: 7c79ecc2f02b17d9e3ffa68235640029923edc59
+  NTJsonStore: 6d3aef4646c48b870cea159a2783ffcd5825e9b2
 
-COCOAPODS: 0.35.0
+PODFILE CHECKSUM: c0f535c670b1b453287064875aff8c32b6167466
+
+COCOAPODS: 1.2.1

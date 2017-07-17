@@ -546,4 +546,19 @@ NSString *NTJsonStore_MetadataTableName = @"NTJsonStore_metadata";
 }
 
 
+#pragma mark - live queries
+
+
+- (BOOL)pushChanges
+{
+    __block BOOL didChange = NO;
+    
+    [self.collections enumerateObjectsUsingBlock:^(NTJsonCollection *collection, NSUInteger idx, BOOL *stop) {
+        didChange |= [collection pushChanges];
+    }];
+    
+    return didChange;
+}
+
+
 @end
