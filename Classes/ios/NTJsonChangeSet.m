@@ -304,11 +304,40 @@
             [changes addObject:[NTJsonChangeSetChange updateWithOldIndex:oldIndex newIndex:newIndex item:remainingNewItem]];
         else
         {
+            BOOL checkUpdate = YES;
+            
+            // if the NEXT itemId in remainingOldItems is the same as the current newRemainingId then we will do a
+            // MOVE DOWN, otherwise we preform a MOVE UP. Either approach works, but when we can pick the right one.
+            // it is more efficient and more visually pleasing.
+            
+            NSDictionary *nextRemainingOldItem = remainingOldItems[remainingNewIndex + 1];  // always safe because there must be a second item to reorder
+            NSNumber *nextRemainingOldItemId = nextRemainingOldItem[NTJsonRowIdKey];
+            
+            if ([nextRemainingOldItemId isEqual:remainingNewItemId]) {
+                // MOVE DOWN
+                oldIndex = [oldItemIds[remainingOldItemId] integerValue];
+                newIndex = [newItemIds[remainingOldItemId] integerValue];
+                
+                remainingNewItem = newItems[newIndex];
+                remainingNewIndex = [remainingNewItems indexOfObject:remainingNewItem];
+                
+                checkUpdate = NO;   // we don't need to check for an update because the next loop iteration will do it
+            } else {
+                // MOVE UP
+                // (all variables are already in place for this)
+            }
+            
             [changes addObject:[NTJsonChangeSetChange moveWithOldIndex:oldIndex newIndex:newIndex item:remainingNewItem]];
+            
+            // See if the move is also an update...
+            
+            remainingOldItem = oldItems[oldIndex];
+            if (checkUpdate &![remainingNewItem isEqualToDictionary:remainingOldItem]) {
+                [changes addObject:[NTJsonChangeSetChange updateWithOldIndex:oldIndex newIndex:newIndex item:remainingNewItem]];
+            }
             
             // now we move the remainingOldItem into the new order so our algo continues to work...
 
-            remainingOldItem = oldItems[oldIndex];
             NSInteger remainingOldIndex = [remainingOldItems indexOfObject:remainingOldItem];
 
             NSDictionary *temp = remainingOldItems[remainingOldIndex];
@@ -317,9 +346,6 @@
         }
     }];
     
-    // todo: there are two ways to look at moves and either strategy could be right.
-    // we need to make another pass and figure if we can make moves simpler by inverting them
-
     return [changes copy];
 }
 
